@@ -4,19 +4,36 @@
 }
 
 #start-button {
-
+ font-size: 16px;
 }
 
-#player1 {
+#player1-image {
 	width: 25%;
 
 }
 
-#player2 {
+#player2-image {
 	width: 20%;
 
 }
 
-.players {
+#player1-name {
+	border-bottom: 3px solid #000000;
+}
+
+#player2-name {
+	border-bottom: 3px solid #000000;
+}
+
+.row {
 	margin-top: 30px;
+}
+
+
+.player-scores {
+	margin-bottom: 30px;
+}
+
+span {
+	padding: 10px;
 }
