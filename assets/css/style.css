@@ -6,3 +6,17 @@
 #start-button {
 
 }
+
+#player1 {
+	width: 25%;
+
+}
+
+#player2 {
+	width: 20%;
+
+}
+
+.players {
+	margin-top: 30px;
+}
