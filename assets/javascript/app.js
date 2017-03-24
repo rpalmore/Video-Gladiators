@@ -10,9 +10,10 @@ var config = {
 firebase.initializeApp(config);
 
 var database = firebase.database();
+
 var playerTree = database.ref("players");
 var currentPlayers = null;
-var username = "";
+var username = "User";
 var playerOneOnline = false;
 var playerTwoOnline = false;
 var playerOneData = null;
@@ -37,6 +38,8 @@ $("#start-button").click(function() {
 // similar to the rps game have an online counter to determ player number
 playerTree.on("value", function(snapshot) {
 
+	// scoreBoard();
+
 	currentPlayers = snapshot.numChildren();
 	console.log("current number of players: " + currentPlayers);
 
@@ -45,24 +48,32 @@ playerTree.on("value", function(snapshot) {
 	playerTwoOnline = snapshot.child("2").exists();
 	console.log(playerTwoOnline);
 
-	playerOneData = snapshot.child("1");
+	playerOneData = snapshot.child("1").val();
 	console.log(playerOneData);
-	playerTwoData = snapshot.child("2");
+	playerTwoData = snapshot.child("2").val();
 	console.log(playerTwoData);
 
 
 	if (playerOneOnline) {
-		$("#player1-name").text(playerOnedata.child("name").val());
+		$("#player1-name").text(playerOneData.name);
+		$("#player1-wins").text("WINS : " + playerOneData.wins);
+		$("#player1-losses").text("LOSSES : " + playerOneData.losses);
 	}
 	else {
 		$("#player1-name").text("waiting for player 1");
+		$("#player1-wins").text("x");
+		$("#player1-losses").text("x");
 	}
 
 	if (playerTwoOnline) {
-		$("#player2-name").text(playerTwodata.child("name").val());
+		$("#player2-name").text(playerTwoData.name);
+		$("#player2-wins").text("WINS : " + playerTwoData.wins);
+		$("#player2-losses").text("LOSSES : " + playerTwoData.losses);
 	}
 	else {
 		$("#player2-name").text("waiting for player 2");
+		$("#player2-wins").text("x");
+		$("#player2-losses").text("x");
 	}
 
 });
@@ -96,4 +107,31 @@ function enterGame() {
 	else {
 		alert("game is full");
 	}
+};
+
+scoreBoard();
+
+function scoreBoard() {
+
+	$(document.body).on("click", "#answer1", function() {
+		if (playerNum === 1) {
+			// alert(playerNum);
+		}
+		else {
+			alert("you are not player 1");
+		}
+	});
+
 }
+
+
+
+
+
+
+
+
+
+
+
+

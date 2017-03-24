@@ -7,7 +7,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -17,20 +16,37 @@
 	</div>
 
 	<div class="top text-center">
+
 		<div id="login-switch"><input id="userName" placeholder="User Name"/>
-			<button id="start-button">Enter the arena</button>
 		</div>
-		<!-- start button can be replaced by timer? -->
+
+		<button id="start-button">Enter the arena</button>
+		
 		<div id="timer"></div>
 	</div>
 
 	<div class="main text-center">
-		<img id="artist-image" src="assets/images/question-mark.png" alt="question mark" class="img-circle">
+
+		<img id="video-placeholder" src="assets/images/question-mark.png" alt="question mark" class="img-circle">
+
+		<span id="video-player"></span>
+		
 	</div>
 
 	<div class="row text-center">
-		<div class="answer col-xs-6 col-xs-offset-3">
-			<span id="question">What song is this?</span>
+
+		<div class="text-center">
+			<span id="question">
+				What year was this video released?
+			</span>
+		</div>
+		
+		<div class="answer col-xs-4 col-xs-offset-4">
+
+			<!-- div for dynamically creating buttons -->
+			<div class="choices"></div>
+
+			<!-- or we can use these -->
 				<div class="row-small">
 					<button id="answer1">Answer 1</button>
 				</div>
@@ -43,7 +59,7 @@
 				<div class="row-small">
 					<button id="answer4">Answer 4</button>
 				</div>
-		</div>
+			</div>
 	</div>
 
 	<div class="row text-center">
@@ -62,7 +78,7 @@
 		</div>
 
 		<div class="player-names col-xs-6">
-			<span id="player2-name">Player 2 Username</span>
+			<span id="player1-name">Player 2 Username</span>
 		</div>
 	</div>
 
@@ -79,7 +95,9 @@
 
 	</div>
 
-<script src="assets/javascript/app.js"></script>
+
 </div>
+<script src="assets/timer.js"></script>
+<script
 </body>
 </html>
