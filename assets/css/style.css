@@ -9,6 +9,11 @@
  margin-left: 37%;
 }
 
+#timer {
+	margin-top: 20px;
+	font-size: 22px;
+}
+
 #player1-image {
 	width: 25%;
 

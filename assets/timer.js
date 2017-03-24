@@ -10,6 +10,7 @@ function start() {
 	$("#start-button").on("click", function() {
 	$("#start-button").hide();
 	startTimer();
+	$(".jumbotron").fadeOut(1000);
   })
 }
 start();
@@ -38,8 +39,9 @@ function stop() {
 }
 
 function revealQuestions() {
-	
+
 }
+
 function revealAnswer() {
 	$("#answer1, #answer2, #answer3").fadeOut(1000);
 }
