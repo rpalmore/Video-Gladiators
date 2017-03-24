@@ -21,11 +21,9 @@ var playerNum = null;
 
 
 $("#start-button").click(function() {
-	alert("clicked");
 	if ($("#username").val() !== "") {
 		username = ($("#userName").val().trim());
 		enterGame();
-		alert("new user added");
 	}
 });
 
@@ -47,27 +45,21 @@ playerTree.on("value", function(snapshot) {
 	playerTwoOnline = snapshot.child("2").exists();
 	console.log(playerTwoOnline);
 
-	playerOneData = snapshot.child("1").child("name").val();
-	
-
+	playerOneData = snapshot.child("1");
 	console.log(playerOneData);
-	
-
-	playerTwoData = snapshot.child("2").val();
-	
-
+	playerTwoData = snapshot.child("2");
 	console.log(playerTwoData);
 
 
 	if (playerOneOnline) {
-		$("#player1-name").text(playerOnedata.name);
+		$("#player1-name").text(playerOnedata.child("name").val());
 	}
 	else {
 		$("#player1-name").text("waiting for player 1");
 	}
 
 	if (playerTwoOnline) {
-		$("#player2-name").text(playerTwodata.name);
+		$("#player2-name").text(playerTwodata.child("name").val());
 	}
 	else {
 		$("#player2-name").text("waiting for player 2");
