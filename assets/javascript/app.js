@@ -19,6 +19,8 @@ var playerTwoOnline = false;
 var playerOneData = null;
 var playerTwoData = null;
 var playerNum = null;
+var wins = 0;
+var losses = 0;
 
 
 $("#start-button").click(function() {
@@ -94,8 +96,8 @@ function enterGame() {
 
 		playerTree.set({
 			name: username,
-			wins: 0,
-			losses: 0
+			wins: wins,
+			losses: losses
 		});
 
 	playerTree.onDisconnect().remove();
@@ -114,8 +116,16 @@ scoreBoard();
 function scoreBoard() {
 
 	$(document.body).on("click", "#answer1", function() {
+		
+		// this is the part where it will key in on what play you are and only set/update your wins vs losses. at the moment i only tested to key in on wins player 1 vs wins player 2
 		if (playerNum === 1) {
-			// alert(playerNum);
+			wins++;
+
+			database.ref("/players/" + playerNum).set({
+				name: username,
+				wins: wins,
+				losses: losses
+			});
 		}
 		else {
 			alert("you are not player 1");
