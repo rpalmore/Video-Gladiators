@@ -127,8 +127,14 @@ function scoreBoard() {
 				losses: losses
 			});
 		}
-		else {
-			alert("you are not player 1");
+		else if (playerNum === 2) {
+			wins++;
+
+			database.ref("/players/" + playerNum).set({
+				name: username,
+				wins: wins,
+				losses: losses
+			});
 		}
 	});
 
