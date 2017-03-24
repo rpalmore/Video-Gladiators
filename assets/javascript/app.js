@@ -42,6 +42,7 @@ playerTree.on("value", function(snapshot) {
 
 	// scoreBoard();
 
+	//this line determins weather or not players have been created. if non the number of children in firebase will be 0;
 	currentPlayers = snapshot.numChildren();
 	console.log("current number of players: " + currentPlayers);
 
@@ -83,6 +84,7 @@ playerTree.on("value", function(snapshot) {
 
 function enterGame() {
 
+	//in this function we assign the player number and limit it to 2;
 	if (currentPlayers < 2) {
 		if (playerOneOnline) {
 			playerNum = 2;
@@ -121,15 +123,14 @@ function scoreBoard() {
 		if (playerNum === 1) {
 			wins++;
 
-			database.ref("/players/" + playerNum).set({
-				name: username,
-				wins: wins,
-				losses: losses
-			});
+			database.ref("/players/" + playerNum).update({wins});
+
+			console.log(playerOneData.wins);
 		}
 		else if (playerNum === 2) {
 			wins++;
 
+		//im leaving this code here for player 2 to compare with the updated code in the player 1 funciton.
 			database.ref("/players/" + playerNum).set({
 				name: username,
 				wins: wins,
