@@ -11,7 +11,6 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 var playersTree = database.ref("players");
-var answersTree =  database.ref("answers");
 var currentPlayers = null;
 var username = "User";
 var playerOneOnline = false;
@@ -21,21 +20,23 @@ var playerTwoData = null;
 var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
-
+var multipleChoices;
 
 
 var generate_multipleChoices = function(correct_answer){
-    var multipleChoices = [correct_answer];
+    multipleChoices = [correct_answer];
     var index = 0;
     while (index < 3){
-        var randomNumber = math.randomInt(-10,10);
+        var randomNumber = correct_answer + math.randomInt(-10,10);
         if (multipleChoices.indexOf(randomNumber) === -1){
-            multipleChoices.push(randomNumber + correct_answer);
+            multipleChoices.push(randomNumber);
             index ++;
         }
     }
     return multipleChoices.sort();
 }
+
+generate_multipleChoices(1998);
 
 
 
@@ -139,23 +140,36 @@ playersTree.on("value", function(snapshot) {
 });
 
 
-    $("#answer").on("click", "p", function() {
-        total_answer ++;
-        if ($(this).text().trim()==="Answer 1"){
-           correct_answer ++;
-           playerTree.update({
-            wins: correct_answer,
-            losses: total_answer - correct_answer
-           })
-        }
-        else{
-            playerTree.update({
-                wins:correct_answer,
-                losses:total_answer - correct_answer
-            })
-        }
+$("#answer").on("click", "p", function() {
+    total_answer ++;
+    if ($(this).text().trim()==="Answer 1"){
+       correct_answer ++;
+       playerTree.update({
+        wins: correct_answer,
+        losses: total_answer - correct_answer
+       })
+    }
+    else{
+        playerTree.update({
+            wins:correct_answer,
+            losses:total_answer - correct_answer
+        })
+    }
 
-        });
+    });
+	
+var AddChoice_to_DOM =  function(){
+	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
+	$("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
+	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
+	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+}
+AddChoice_to_DOM();
+
+// $("#answer").on("click", "p", function(){
+// 	$("i").className = "fa fa-circle -o fa-1.5x"
+// 	$(this).children("i").className = "fa fa-dot-circle-o fa-1.5x"
+// })
 
 
 
