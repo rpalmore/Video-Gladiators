@@ -142,7 +142,7 @@ playersTree.on("value", function(snapshot) {
 
 $("#answer").on("click", "p", function() {
     total_answer ++;
-    if ($(this).text().trim()==="Answer 1"){
+    if ($(this).text().trim()==1998){
        correct_answer ++;
        playerTree.update({
         wins: correct_answer,
@@ -166,10 +166,13 @@ var AddChoice_to_DOM =  function(){
 }
 AddChoice_to_DOM();
 
-// $("#answer").on("click", "p", function(){
-// 	$("i").className = "fa fa-circle -o fa-1.5x"
-// 	$(this).children("i").className = "fa fa-dot-circle-o fa-1.5x"
-// })
+$("#answer").on("click", "p", function(){
+	$("#answer p").children("i").attr("class","fa fa-circle-o fa-1.5x")
+	$(this).children("i").attr("class","fa fa-dot-circle-o fa-1.5x");
+	playerTree.update({
+		answer: parseInt($(this).text().trim())
+	})
+});
 
 
 
