@@ -5,11 +5,23 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Music Gladiators</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
 </head>
 <body>
+
+<div id="myModal" class="modal">
+	<div class="modal-content">
+		<p>Some Text in the MODAL... </p>
+	</div>
+</div>
+
+
+
+
+
 <div class="container-fluid">
 	<div class="jumbotron text-center">
   		<h1>Music Gladiators</h1>
@@ -17,8 +29,9 @@
 	</div>
 
 	<div class="top text-center">
-		<div id="login-switch"><input id="userName" placeholder="User Name"/>
-			<button id="start-button">Enter the arena</button>
+		<div id="login-switch">
+			<input id="userName" class = "text-center" placeholder="User Name">
+			<button class ="btn btn-primary" id="start-button">Enter the arena</button>
 		</div>
 		<!-- start button can be replaced by timer? -->
 		<div id="timer"></div>
@@ -29,19 +42,13 @@
 	</div>
 
 	<div class="row text-center">
-		<div class="answer col-xs-6 col-xs-offset-3">
+		<div class="col-xs-6 col-xs-offset-3" id = "answer">
 			<span id="question">What song is this?</span>
 				<div class="row-small">
-					<button id="answer1">Answer 1</button>
-				</div>
-				<div class="row-small">
-					<button id="answer2">Answer 2</button>
-				</div>
-				<div class="row-small">
-					<button id="answer3">Answer 3</button>
-				</div>
-				<div class="row-small">
-					<button id="answer4">Answer 4</button>
+					<p id="answer1"><i class="fa fa-circle-o fa-1.5x" aria-hidden="true"></i>Answer 1</p>
+					<p id="answer2"><i class="fa fa-circle-o fa-1.5x" aria-hidden="true"></i>Answer 2</button>
+					<p id="answer3"><i class="fa fa-circle-o fa-1.5x" aria-hidden="true"></i>Answer 3</button>
+					<p id="answer4"><i class="fa fa-circle-o fa-1.5x" aria-hidden="true"></i>Answer 4</button>
 				</div>
 		</div>
 	</div>
@@ -79,7 +86,7 @@
 
 	</div>
 
-<script src="assets/javascript/app.js"></script>
+<script src="app.js"></script>
 </div>
 </body>
 </html>
