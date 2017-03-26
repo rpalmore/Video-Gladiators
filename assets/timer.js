@@ -28,7 +28,6 @@ var correct_answer = 0;
 
 $(".main").hide();
 $(".welcome").hide();
-$(".interstitial").hide();
 
 
 $("#start-button").click(function() {
@@ -74,8 +73,6 @@ function enterGame() {
 
 };
 
-
-
 playersTree.on("value", function(snapshot) {
 
     // scoreBoard();
@@ -92,14 +89,17 @@ playersTree.on("value", function(snapshot) {
         countdown();
     }
 
-
 function countdown() {
     timer = 5;
     intervalID = setInterval(decrement1, 1000);
     $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");  
-    $(".interstitial").show();
+    $(".main").show();
     $("#video-placeholder").fadeOut(5000);
+    $("#video-player").hide();
     $(".welcome").hide();
+    $(".answerPlaceholder").empty();
+    $(".answer").hide();
+    $(".score").hide();
 }
 
 function displayNames () {
@@ -121,18 +121,21 @@ function decrement1() {
 function startTrivia() {
     timer = 15;
     intervalID = setInterval(decrement2, 1000);
-    $("#timer").text("What year was this video released?");
-    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
-    $(".interstitial").hide();
-    $(".main").show();
+    $("#question").text("What year was this video released?");
+    $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
+    $("#timer").hide();
+    $(".answerPlaceholder").remove();
+    $(".answer").show();
+    $(".score").show();
+    $("#video-player").show();
 }
 
 function decrement2() {
     timer--;
-    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
+    $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
         if (timer === 0) {
         stop();
-        $("#question").text("Time's up!");
+        $("#gameTimer").text("Time's up!");
         setTimeout(startTrivia, 1000 * 3);
     }
 }
@@ -154,30 +157,6 @@ $("#userName").hover(function(){
     }, function(){
         $(this).css("background-color", "white");
 });
-
-
-
-    // if (playerOneOnline) {
-    //     $("#player1-name").text(playerOneData.name);
-    //     $("#player1-wins").text("WINS : " + playerOneData.wins);
-    //     $("#player1-losses").text("LOSSES : " + playerOneData.losses);
-    // }
-    // else {
-    //     $("#player1-name").text("waiting for player 1");
-    //     $("#player1-wins").text("x");
-    //     $("#player1-losses").text("x");
-    // }
-
-    // if (playerTwoOnline) {
-    //     $("#player2-name").text(playerTwoData.name);
-    //     $("#player2-wins").text("WINS : " + playerTwoData.wins);
-    //     $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
-    // }
-    // else {
-    //     $("#player2-name").text("waiting for player 2");
-    //     $("#player2-wins").text("x");
-    //     $("#player2-losses").text("x");
-    // }
 
 });
 

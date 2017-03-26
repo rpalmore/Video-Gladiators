@@ -64,15 +64,6 @@ h3:before {
 	margin-bottom: 10px;
 }
 
-/* Placeholder for YouTube video */
-#video-player {
-	width: 400px;
-	height: 300px;
-	margin-bottom: 10px;
-	background-color: red;
-	border: 1px solid #000000;
-}
-
 #start-button, #userName {
  	width: 20%;
  	height: 60px;
@@ -96,19 +87,6 @@ h3:before {
 
 /* This is the white backdrop when
    game starts */
-.interstitial {
-	margin-top: 10px;
-	margin-right: 100px;
-	margin-bottom: 100px;
-	margin-left: 100px;
-	padding-top: 30px;
-	padding-bottom: 30px;
-  	background-color: #ffffff;
-  	border: 1px solid #000000;
-}
-
-/* This is the white backdrop when
-   game starts */
 .main {
 	margin-top: 10px;
 	margin-right: 100px;
@@ -120,8 +98,18 @@ h3:before {
   	border: 1px solid #000000;
 }
 
-#timer {
+#timer, #gameTimer {
  	font-size: 22px;
+}
+
+#timer, #gameTimer {
+ 	margin-top: 10px;
+}
+
+#question {
+	font-size: 22px;
+	margin-top: 10px;
+	margin-bottom: 20px;
 }
 
 #player1-image {
@@ -176,6 +164,3 @@ button {
 	text-align: center;
 }
 
-#question {
-	font-size: 22px;
-}
