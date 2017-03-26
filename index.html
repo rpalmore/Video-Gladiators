@@ -37,15 +37,44 @@
 			<h3 data-text="Waiting for player 2 ...">Waiting for player 2 ...</h3>
 		</div>
 
+	</div>
 
-	<div class="main text-center">
+	<div class="interstitial text-center">
 
 		<div id="timer"></div>
 
-		<img id="video-placeholder" src="assets/images/question-mark.png" alt="question mark" class="img-circle">
+		<img id="video-placeholder" src="assets/images/question-mark.png" alt="question mark">
 
-		<div id="video-player"></div>
-		
+		<div class="row text-center">
+
+			<div class="players col-xs-4">
+				<p>
+					<img id="player1-image" src="assets/images/player1.png" alt="player one">
+				</p>
+				<p>
+					<span id="player1-name"></span>
+				</p>
+			</div>
+
+			<div class="players col-xs-4 col-xs-offset-4">
+				<p>
+					<img id="player2-image" src="assets/images/player2.png" alt="player two">
+				</p>
+				<p>
+					<span id="player2-name"></span>
+				</p>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="main text-center">
+
+		<div id="timer">
+		</div>
+
+		<div id="video-player text-center">
+		</div>
 
 		<div class="row text-center">
 
@@ -64,25 +93,27 @@
 					<img id="player1-image" src="assets/images/player1.png" alt="player one">
 				</p>
 				<p>
-					<span id="player1-name">Player 1 Username</span>
+					<span id="player1-name"></span>
 				</p>
 				<p>
 					<span id="player1-wins">Wins: </span>
 					<span id="player1-losses">Losses: </span>
 				</p>
 			</div>
+
 			<div class="answer col-xs-4">
 				<button id="answer1">TKTK</button>
 				<button id="answer2">TKTK</button>
 				<button id="answer3">TKTK</button>
 				<button id="answer4">TKTK</button>
 			</div>
+
 			<div class="players col-xs-4">
 				<p>
 					<img id="player2-image" src="assets/images/player2.png" alt="player two">
 				</p>
 				<p>
-					<span id="player2-name">Player 2 Username</span>
+					<span id="player2-name"></span>
 				</p>
 				<p>
 					<span id="player2-wins">Wins: </span>
@@ -91,6 +122,9 @@
 			</div>
 
 		</div>
+
+	</div>
+
 </div>
 
 <script src="assets/timer.js"></script>

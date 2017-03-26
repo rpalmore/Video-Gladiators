@@ -27,30 +27,8 @@ var total_answer = 0;
 var correct_answer = 0;
 
 $(".main").hide();
-$(".row").hide();
 $(".welcome").hide();
-// $(".waiting").hide();
-
-// Need to add interstitial here for "waiting" player
-// What happens after they click "enter"?
-// Waiting for player 2
-
-// function waitingPlayer2() {
-//     $("#start-button").on("click", function() {
-//     $("#start-button").hide();
-//     $(".jumbotron").slideUp(1000);
-//     $("video").slideUp(1000);
-//     $("#userName").hide();
-//     $(".welcome").show();
-//     $(".welcome").html("Welcome, " + "player1-name" + ("<p>")
-//         + "Waiting for player 2");
-//         if (playerOneOnline && playerTwoOnline);
-//             countdown();
-//     })
-// }
-
-
-// waitingPlayer2();
+$(".interstitial").hide();
 
 
 $("#start-button").click(function() {
@@ -61,77 +39,40 @@ $("#start-button").click(function() {
         $("video").slideUp(1000);
         $("#userName").hide();
         $(".welcome").show();
-        // $(".waiting").show();
-        // $(".waiting").html("We are waiting for player 2 ...");
         enterGame();
     }
 });
 
+function enterGame() {
 
-function countdown() {
-    timer = 5;
-    intervalID = setInterval(decrement1, 1000);
-    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
-    $("#video-placeholder").fadeOut(5000);
-    $(".main").show();
-    $(".row").show();
-    $(".welcome").hide();
-}
-
-
-function decrement1() {
-    timer--;
-    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
-        if (timer === 0) {
-            stop();
-            questionTimer();
+    if (currentPlayers < 2) {
+        if (playerOneOnline) {
+            playerNum = 2;
         }
-}
+        else {
+            playerNum = 1;
+        }
+    
 
-function questionTimer() {
-    timer = 15;
-    intervalID = setInterval(decrement2, 1000);
-    $("#timer").text("What year was this video released?");
-    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
-}
+        playerTree = database.ref("/players/" + playerNum);
 
+        playerTree.set({
+            name: username,
+            wins: 0,
+            losses: 0
+        });
 
-function decrement2() {
-    timer--;
-    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
-        if (timer === 0) {
-        stop();
-        $("#question").text("Time's up!");
-        setTimeout(questionTimer, 1000 * 3);
+    playerTree.onDisconnect().remove();
+
+    $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
+
     }
-}
 
+    else {
+        alert("NO MORE SPACE");
+    }
 
-function stop() {
-	clearInterval(intervalID);
-}
-
-// function revealQuestions() {
-// }
-
-// function revealAnswer() {
-// 	$("#answer1, #answer2, #answer3").fadeOut(1000);
-// }
-
-
-// Some button styles
-
-$("#start-button").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
-});
-
-$("#userName").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
-});
+};
 
 
 
@@ -150,6 +91,70 @@ playersTree.on("value", function(snapshot) {
     if (currentPlayers === 2) {
         countdown();
     }
+
+
+function countdown() {
+    timer = 5;
+    intervalID = setInterval(decrement1, 1000);
+    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");  
+    $(".interstitial").show();
+    $("#video-placeholder").fadeOut(5000);
+    $(".welcome").hide();
+}
+
+function displayNames () {
+    $("#player1-name").text(playerOneData.name);
+    $("#player2-name").text(playerTwoData.name);
+}
+
+displayNames();
+
+function decrement1() {
+    timer--;
+    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
+        if (timer === 0) {
+            stop();
+            startTrivia();
+        }
+}
+
+function startTrivia() {
+    timer = 15;
+    intervalID = setInterval(decrement2, 1000);
+    $("#timer").text("What year was this video released?");
+    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
+    $(".interstitial").hide();
+    $(".main").show();
+}
+
+function decrement2() {
+    timer--;
+    $("#question").text("You have:" + (" ") + timer + (" ") + "seconds");
+        if (timer === 0) {
+        stop();
+        $("#question").text("Time's up!");
+        setTimeout(startTrivia, 1000 * 3);
+    }
+}
+
+function stop() {
+    clearInterval(intervalID);
+}
+
+// Some button styles
+
+$("#start-button").hover(function(){
+    $(this).css("background-color", "#fdd865");
+    }, function(){
+        $(this).css("background-color", "white");
+});
+
+$("#userName").hover(function(){
+    $(this).css("background-color", "#fdd865");
+    }, function(){
+        $(this).css("background-color", "white");
+});
+
 
 
     // if (playerOneOnline) {
@@ -176,37 +181,6 @@ playersTree.on("value", function(snapshot) {
 
 });
 
-function enterGame() {
 
-    if (currentPlayers < 2) {
-        if (playerOneOnline) {
-            playerNum = 2;
-        }
-        else {
-            playerNum = 1;
-        }
-    
-
-        playerTree = database.ref("/players/" + playerNum);
-
-        playerTree.set({
-            name: username,
-            wins: 0,
-            losses: 0
-        });
-
-    playerTree.onDisconnect().remove();
-
-    $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
-
-
-
-    }
-
-    else {
-        alert("NO MORE SPACE");
-    }
-
-};
 
 
