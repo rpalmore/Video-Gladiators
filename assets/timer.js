@@ -10,7 +10,6 @@
   firebase.initializeApp(config);
 
 
-
 var timer = 15;
 var intervalID;
 var database = firebase.database();
@@ -26,21 +25,23 @@ var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
 
-$(".main").hide();
-$(".welcome").hide();
+// A few divs we have to hide at the start of the game
 
+$(".main, .welcome").hide();
+
+// Action when player 1 clicks "enter the arena"
 
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
         username = ($("#userName").val().trim());
-        $("#start-button").hide();
-        $(".jumbotron").slideUp(1000);
-        $("video").slideUp(1000);
-        $("#userName").hide();
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
         enterGame();
     }
 });
+
+// Display player 1 username in "welcome" div
 
 function enterGame() {
 
@@ -89,18 +90,19 @@ playersTree.on("value", function(snapshot) {
         countdown();
     }
 
+// Action after player 2 signs in and clicks "enter"
+
 function countdown() {
     timer = 5;
     intervalID = setInterval(decrement1, 1000);
     $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");  
     $(".main").show();
     $("#video-placeholder").fadeOut(5000);
-    $("#video-player").hide();
-    $(".welcome").hide();
+    $("#video-player, .welcome, .answer, .score").hide();
     $(".answerPlaceholder").empty();
-    $(".answer").hide();
-    $(".score").hide();
 }
+
+// Writing usernames to the DOM
 
 function displayNames () {
     $("#player1-name").text(playerOneData.name);
@@ -108,6 +110,8 @@ function displayNames () {
 }
 
 displayNames();
+
+// This is our timer countdown function for the pre-game clock
 
 function decrement1() {
     timer--;
@@ -118,6 +122,9 @@ function decrement1() {
         }
 }
 
+// This is our timer countdown for the trivia questions. We will need a loop
+// around this eventually I think, to get to the final page after 15 rounds.
+
 function startTrivia() {
     timer = 15;
     intervalID = setInterval(decrement2, 1000);
@@ -125,10 +132,10 @@ function startTrivia() {
     $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
     $("#timer").hide();
     $(".answerPlaceholder").remove();
-    $(".answer").show();
-    $(".score").show();
-    $("#video-player").show();
+    $(".answer, .score, #video-player").show();
 }
+
+// This is the clock counting down and restarting
 
 function decrement2() {
     timer--;
