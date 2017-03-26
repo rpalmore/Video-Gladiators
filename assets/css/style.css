@@ -3,6 +3,7 @@ body {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
+	font-family: 'Roboto', sans-serif;
 }
 
 .jumbotron {
@@ -133,15 +134,23 @@ h3:before {
 
 #player1-name {
 	font-size: 24px;
-	border-bottom: 3px solid #000000;
+	border-bottom: 5px solid #ab241c;
 	margin-bottom: 10px;
 }
 
 #player2-name {
 	font-size: 24px;
-	border-bottom: 3px solid #000000;
+	border-bottom: 5px solid #5d9ad1;
 	margin-bottom: 10px;
 }
+
+/*.player1 {
+	background-color: red;
+}
+
+.player2 {
+	background-color: blue;
+}*/
 
 #player1-wins, #player2-wins {
 	padding: 10px;
