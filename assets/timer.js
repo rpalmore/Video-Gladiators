@@ -1,11 +1,11 @@
 
   // Initialize Firebase
   var config = {
-    apiKey: "AIzaSyCJjoqV8O6mAQKVXOGStzDdNiK1OYiQ-hc",
-    authDomain: "test-b2024.firebaseapp.com",
-    databaseURL: "https://test-b2024.firebaseio.com",
-    storageBucket: "test-b2024.appspot.com",
-    messagingSenderId: "1048353574850"
+    apiKey: "AIzaSyAznUZ10oaloQU9P2Jm1UwDOegZzwoIB-s",
+    authDomain: "test-1-df1ad.firebaseapp.com",
+    databaseURL: "https://test-1-df1ad.firebaseio.com",
+    storageBucket: "test-1-df1ad.appspot.com",
+    messagingSenderId: "600600072308"
   };
   firebase.initializeApp(config);
 
@@ -88,6 +88,13 @@ playersTree.on("value", function(snapshot) {
     
     if (currentPlayers === 2) {
         countdown();
+        $("#login-switch").hide();
+        $("#start-button, #userName").hide();
+        $(".welcome").hide();
+    }
+    else if (playersTree.onDisconnect()) {
+        console.log("player was disconnected!");
+
     }
 
 // Action after player 2 signs in and clicks "enter"
@@ -103,13 +110,28 @@ function countdown() {
 }
 
 // Writing usernames to the DOM
+if (playerOneOnline) {
+        $("#player1-name").text(playerOneData.name);
+        $("#player1-wins").text("WINS : " + playerOneData.wins);
+        $("#player1-losses").text("LOSSES : " + playerOneData.losses);
+    }
+    else {
+        $("#player1-name").text("DISCONNECTED");
+        $("#player1-wins").text("x");
+        $("#player1-losses").text("x");
+    }
 
-function displayNames () {
-    $("#player1-name").text(playerOneData.name);
-    $("#player2-name").text(playerTwoData.name);
-}
+    if (playerTwoOnline) {
+        $("#player2-name").text(playerTwoData.name);
+        $("#player2-wins").text("WINS : " + playerTwoData.wins);
+        $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
+    }
+    else {
+        $("#player2-name").text("DISCONNECTED");
+        $("#player2-wins").text("x");
+        $("#player2-losses").text("x");
+    }
 
-displayNames();
 
 // This is our timer countdown function for the pre-game clock
 
