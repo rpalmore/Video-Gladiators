@@ -90,6 +90,7 @@ h3:before {
  	text-align: center;
  	float: left;
  	margin-left: 28%;
+ 	text-transform: capitalize;
 }
 
 /* This is the white backdrop when
