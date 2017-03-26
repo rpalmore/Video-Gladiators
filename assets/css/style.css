@@ -1,38 +1,133 @@
+body {
+	background-image: url("../images/TreyRatcliff.jpg");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+}
+
+.jumbotron {
+	background-color: #ffffff;
+	border-bottom: 1px solid #000000;
+}
+
+.youArePlayer {
+	padding-top: 10px;
+}
+
+/* This is the gif that plays in the jumbotron
+   in the very first screen */
+video {
+	width: 20%;
+	position: absolute;
+}
+
+.welcome {
+	height: 150px;
+	line-height: 75px;
+	background-color: #3498db;
+	font-size: 22px;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+	border-left: 1px solid #000000;
+}
+
+/* Below is the "loading" CSS
+   as we wait for player 2 */
+h3 {
+	position: relative;
+    color: rgba(0, 0, 0, .3);
+    font-weight: bold;
+}
+
+h3:before {
+    content: attr(data-text);
+    position: absolute;
+    overflow: hidden;
+    max-width: 25%;
+    white-space: nowrap;
+    color: #ffffff;
+    font-weight: bold;
+    animation: loading 6s infinite;
+}
+
+@keyframes loading {
+    0% {
+        max-width: 0;
+    }
+}
+
+/* End "loading" CSS */
+
+/* This is the big question mark */
 #video-placeholder {
 	width: 30%;
 	margin-top: 30px;
 }
 
+/* Placeholder for YouTube video */
 #video-player {
-	width: 30%;
+	width: 400px;
+	height: 300px;
 	margin-top: 30px;
+	border: 1px solid #ffffff;
+}
+
+#start-button, #userName {
+ 	width: 20%;
+ 	height: 60px;
+ 	background-color: #ffffff;
+ 	border: 1px solid #000000;
 }
 
 #start-button {
  	font-size: 16px;
- 	width: 25%;
- 	margin-left: 37%;
+ 	float: right;
+ 	margin-right: 28%;
 }
 
 #userName {
  	font-size: 22px;
- 	margin-bottom: 30px;
  	text-align: center;
+ 	float: left;
+ 	margin-left: 28%;
 }
 
+/* This is the white backdrop when
+   game starts */
+.main {
+	margin-top: 10px;
+	margin-right: 100px;
+	margin-bottom: 100px;
+	margin-left: 100px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+  	background-color: #ffffff;
+  	border: 1px solid #000000;
+}
+
+
 #timer {
-	margin-top: 20px;
-	font-size: 22px;
+ 	font-size: 22px;
 }
 
 #player1-image {
 	width: 25%;
-
 }
 
 #player2-image {
 	width: 20%;
 
+}
+
+#player1-chat {
+	transform:scale(-1,1);
+	width: 30%;
+	float: left;
+}
+
+#player2-chat {
+	width: 30%;
+	float: right;
 }
 
 #player1-name {
@@ -51,11 +146,13 @@
 	margin-top: 10px;
 }
 
+/* Answer buttons */
 button {
 	display: block;
 	width: 100%;
-	padding: 15px;
+	padding: 10px;
 	font-size: 16px;
+	text-align: center;
 }
 
 .player-scores {

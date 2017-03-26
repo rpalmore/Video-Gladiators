@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Music Gladiators</title>
+	<title>Video Gladiators</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -11,48 +11,86 @@
 </head>
 <body>
 <div class="container-fluid">
+	<video autoplay loop>
+  		<source src="assets/images/giphy.mp4" type="video/mp4">
+  		<source src="assets/images/giphy.ogg" type="video/ogg">
+  		Your browser does not support the video tag.
+	</video>
 	<div class="jumbotron text-center">
-  		<h1>Music Gladiators</h1>
-  		<p>Challenge friend or foe to a melodious game of skill and speed</p> 
+  		<h1>Video Gladiators</h1>
+  		<p>Challenge friend or foe to a viral video game of skill and speed</p> 
 	</div>
 
 	<div class="top text-center">
-		<div id="login-switch"><input id="userName" placeholder="User Name"/>
-			<button id="start-button">Enter the arena</button>
-		</div>
-		<!-- start button can be replaced by timer? -->
-		<div id="timer"></div>
-	</div>
 
-	<div class="main text-center">
-		<img id="artist-image" src="assets/images/question-mark.png" alt="question mark" class="img-circle">
-	</div>
+		<div id="login-switch">
+			<input id="userName" placeholder="User Name"/>
+		</div>
+
+		<button id="start-button">Enter the arena</button>
+
+		<div class="welcome">
+			<div class="youArePlayer"></div>
+			<h3 data-text="Waiting for player 2 ...">Waiting for player 2 ...</h3>
+		</div>
+
+
+		<div class="main text-center">
+
+			<div id="timer"></div>
+
+			<img id="video-placeholder" src="assets/images/question-mark.png" alt="question mark" class="img-circle">
+
+			<div id="video-player"></div>
+		
+
+		<div class="row text-center">
+
+			<div class="text-center">
+				<span id="question">
+					What year was this video released?
+				</span>
+			</div>
+
+			<div class="answer col-xs-4 col-xs-offset-4">
+
+				<!-- div to target if we dynamically create buttons -->
+				<div class="choices"></div>
+
+				<!-- or we can use these -->
+					<div class="row-small">
+						<button id="answer1">TKTK</button>
+					</div>
+					<div class="row-small">
+						<button id="answer2">TKTK</button>
+					</div>
+					<div class="row-small">
+						<button id="answer3">TKTK</button>
+					</div>
+					<div class="row-small">
+						<button id="answer4">TKTK</button>
+					</div>
+				</div>
+		</div>
 
 	<div class="row text-center">
-		<div class="answer col-xs-6 col-xs-offset-3">
-			<span id="question">What song is this?</span>
-				<div class="row-small">
-					<button id="answer1">Answer 1</button>
-				</div>
-				<div class="row-small">
-					<button id="answer2">Answer 2</button>
-				</div>
-				<div class="row-small">
-					<button id="answer3">Answer 3</button>
-				</div>
-				<div class="row-small">
-					<button id="answer4">Answer 4</button>
-				</div>
+
+		<div class="player-images">
+			<img id="player1-chat" src="assets/images/speechBubble.png" alt="player two speech bubble">
 		</div>
-	</div>
+
+
+		<div class="player-images">
+			<img id="player2-chat" src="assets/images/speechBubble.png" alt="player two speech bubble">
+		</div>
 
 	<div class="row text-center">
 		<div class="player-images col-xs-6">
-			<img id="player1-image" src="assets/images/player1.png" alt="player one" class="img-rounded">
+			<img id="player1-image" src="assets/images/player1.png" alt="player one">
 		</div>
 
 		<div class="player-images col-xs-6">
-			<img id="player2-image" src="assets/images/player2.png" alt="player two" class="img-rounded">
+			<img id="player2-image" src="assets/images/player2.png" alt="player two">
 		</div>
 	</div>
 
@@ -62,7 +100,7 @@
 		</div>
 
 		<div class="player-names col-xs-6">
-			<span id="player2-name">Player 2 Username</span>
+			<span id="player1-name">Player 2 Username</span>
 		</div>
 	</div>
 
@@ -79,7 +117,10 @@
 
 	</div>
 
-<script src="assets/javascript/app.js"></script>
 </div>
+
+</div>
+<script src="assets/timer.js"></script>
+<script
 </body>
 </html>
