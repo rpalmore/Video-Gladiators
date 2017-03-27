@@ -24,6 +24,9 @@ var playerTwoData = null;
 var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
+// ADDED CHAT HERE
+var chatData = database.ref("/chat");
+// END
 
 // A few divs we have to hide at the start of the game
 
@@ -33,13 +36,57 @@ $(".main, .welcome").hide();
 
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
-        username = ($("#userName").val().trim());
+        username = capitalize($("#userName").val().trim());
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
         enterGame();
     }
 });
+
+function capitalize(name) {
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+// ADDED CHAT HERE
+// CHAT LISTENERS
+// Chat send button listener, grabs input and pushes to firebase. (Firebase's push automatically creates a unique key)
+$("#chat-send").click(function() {
+
+  if ($("#chat-input").val() !== "") {
+
+    var message = $("#chat-input").val();
+
+    chatData.push({
+      name: username,
+      message: message,
+      time: firebase.database.ServerValue.TIMESTAMP,
+      idNum: playerNum
+    });
+
+    $("#chat-input").val("");
+  }
+});
+
+// Chatbox input listener
+
+$("#chat-input").keypress(function(e) {
+
+  if (e.keyCode === 13 && $("#chat-input").val() !== "") {
+
+    var message = $("#chat-input").val();
+
+    chatData.push({
+      name: username,
+      message: message,
+      time: firebase.database.ServerValue.TIMESTAMP,
+      idNum: playerNum
+    });
+
+    $("#chat-input").val("");
+  }
+});
+// END
 
 // Display player 1 username in "welcome" div
 
@@ -52,7 +99,10 @@ function enterGame() {
         else {
             playerNum = 1;
         }
-    
+        
+        // ADDED CHAT FUCTION HERE
+        var chatDataDisc = database.ref("/chat/" + Date.now());
+        // END
 
         playerTree = database.ref("/players/" + playerNum);
 
@@ -62,7 +112,37 @@ function enterGame() {
             losses: 0
         });
 
+        // ADDED CHAT FUCTION HERE
+        // Update chat on screen when new message detected - ordered by 'time' value
+        chatData.orderByChild("time").on("child_added", function(snapshot) {
+
+        // If idNum is 0, then its a disconnect message and displays accordingly
+        // If not - its a user chat message
+        if (snapshot.val().idNum === 0) {
+            $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+            + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+            }
+        else {
+            $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+            + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+            }
+
+        // Keeps div scrolled to bottom on each update.
+        $("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
+        });
+
     playerTree.onDisconnect().remove();
+
+    // ADDED CHAT FUCTION HERE
+    // Send disconnect message to chat with Firebase server generated timestamp 
+    // and id of '0' to denote system message
+      chatDataDisc.onDisconnect().set({
+      name: username,
+      time: firebase.database.ServerValue.TIMESTAMP,
+      message: "has disconnected.",
+      idNum: 0
+       });
+      //END
 
     $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
 
@@ -151,6 +231,9 @@ function stop() {
     clearInterval(intervalID);
 }
 
+});
+
+
 // Some button styles
 
 $("#start-button").hover(function(){
@@ -165,8 +248,24 @@ $("#userName").hover(function(){
         $(this).css("background-color", "white");
 });
 
+$("#chat-send").hover(function(){
+    $(this).css("background-color", "#fdd865");
+    }, function(){
+        $(this).css("background-color", "white");
 });
 
+  // ADDED CHAT FUCTION HERE
+  // If idNum is 0, then its a disconnect message and displays accordingly
+  // If not - its a user chat message
+  if (snapshot.val().idNum === 0) {
+    $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+    + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+  }
+  else {
+    $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+    + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+  }
+// END
 
 
 
