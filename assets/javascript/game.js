@@ -17,7 +17,7 @@ var gameData = {
     totalPlayers: 0,
     targetStage: 0,
     currentStage: 0,
-    currentAnswers: 0,
+    totalAnswers: 0,
     videoId: '',
     correctAnswer: null,
     clickedAnswer: false,
@@ -130,7 +130,7 @@ gameInfo.on('value', function(splash){
             triggerHost()
         } else if(stage === 3){
             playVideoById(gameData.videoId);
-            triggerHost();
+            gameData.totalAnswers = 0;
         } else if(stage === 4){
             console.log('receive first answer');
         } else if(stage === 5){
@@ -138,6 +138,47 @@ gameInfo.on('value', function(splash){
         }
     }
 }); 
+
+playersTree.on("value", function(snapshot) {
+    currentPlayers = snapshot.numChildren();
+    
+    playerOneOnline = snapshot.child("1").exists();
+    playerTwoOnline = snapshot.child("2").exists();
+    playerOneData = snapshot.child("1").val();
+    playerTwoData = snapshot.child("2").val();
+    
+    if (currentPlayers === 2 && !gameData.playingGame) {
+        gameData.playingGame = true;
+        countdown();
+        $("#login-switch").hide();
+        $("#start-button, #userName").hide();
+        $(".welcome").hide();
+    } else if (currentPlayers < 2){
+        gameData.targetStage = 0;
+        gameData.currentStage = 0;
+    } else if (playersTree.onDisconnect()) {
+        console.log("player was disconnected!");
+    }
+
+    if (playerOneOnline) {
+        $("#player1-name").text(playerOneData.name);
+        $("#player1-wins").text("WINS : " + playerOneData.wins);
+        $("#player1-losses").text("LOSSES : " + playerOneData.losses);
+    } else {
+        $("#player1-name").text("DISCONNECTED");
+        $("#player1-wins").text("x");
+        $("#player1-losses").text("x");
+    }
+    if (playerTwoOnline) {
+        $("#player2-name").text(playerTwoData.name);
+        $("#player2-wins").text("WINS : " + playerTwoData.wins);
+        $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
+    } else {
+        $("#player2-name").text("DISCONNECTED");
+        $("#player2-wins").text("x");
+        $("#player2-losses").text("x");
+    }
+});
 
 // Display player 1 username in "welcome" div
 function enterGame() {
@@ -167,45 +208,6 @@ function enterGame() {
         alert("NO MORE SPACE");
     }
 };
-
-playersTree.on("value", function(snapshot) {
-    // scoreBoard();
-    currentPlayers = snapshot.numChildren();
-    
-    playerOneOnline = snapshot.child("1").exists();
-    playerTwoOnline = snapshot.child("2").exists();
-    playerOneData = snapshot.child("1").val();
-    playerTwoData = snapshot.child("2").val();
-    
-    if (currentPlayers === 2 && !gameData.playingGame) {
-        gameData.playingGame = true;
-        countdown();
-        $("#login-switch").hide();
-        $("#start-button, #userName").hide();
-        $(".welcome").hide();
-    } else if (playersTree.onDisconnect()) {
-        console.log("player was disconnected!");
-    }
-
-    if (playerOneOnline) {
-        $("#player1-name").text(playerOneData.name);
-        $("#player1-wins").text("WINS : " + playerOneData.wins);
-        $("#player1-losses").text("LOSSES : " + playerOneData.losses);
-    } else {
-        $("#player1-name").text("DISCONNECTED");
-        $("#player1-wins").text("x");
-        $("#player1-losses").text("x");
-    }
-    if (playerTwoOnline) {
-        $("#player2-name").text(playerTwoData.name);
-        $("#player2-wins").text("WINS : " + playerTwoData.wins);
-        $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
-    } else {
-        $("#player2-name").text("DISCONNECTED");
-        $("#player2-wins").text("x");
-        $("#player2-losses").text("x");
-    }
-});
 
 // Action after player 2 signs in and clicks "enter"
 function countdown() {
@@ -266,7 +268,7 @@ function capitalize(name){
 // Action when player 1 clicks "enter the arena"
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
-        username = ($("#userName").val().trim());
+         username = capitalize(($("#userName").val().trim()));
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
@@ -277,15 +279,22 @@ $("#start-button").click(function() {
 $(".answer").on("click", function() {
     if(!gameData.clickedAnswer){
         console.log('clicked answer');
+
+        //Answer forwarding
+        gameData.targetStage++;
+        gameInfo.update({
+            gameStage: gameData.targetStage
+        });
+
         total_answer ++;
         if ($(this).text().trim()==gameData.correctAnswer){
-                correct_answer ++;
-                playerTree.update({
+            correct_answer ++;
+            playerTree.update({
                 wins: correct_answer,
                 losses: total_answer - correct_answer
-                });
-            } else{
-                playerTree.update({
+            });
+        } else {
+            playerTree.update({
                 wins:correct_answer,
                 losses:total_answer - correct_answer
             });

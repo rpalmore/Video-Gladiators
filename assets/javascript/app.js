@@ -39,12 +39,12 @@
 // generate_multipleChoices(1998);
 
 
-$("#start-button").click(function() {
-    if ($("#username").val() !== "") {
-        username = capitalize(($("#userName").val().trim()));
-        enterGame();
-    }
-});
+// $("#start-button").click(function() {
+//     if ($("#username").val() !== "") {
+//         username = capitalize(($("#userName").val().trim()));
+//         enterGame();
+//     }
+// });
 
 $("#userName").keypress(function(e){
     if(e.keyCode === 13 && $("#username").val()!==""){
@@ -153,12 +153,12 @@ $(".answer").on("click", function() {
     }
 });
 	
-var AddChoice_to_DOM =  function(){
-	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
-	$("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
-	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
-	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
-}
+// var AddChoice_to_DOM =  function(){
+// 	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
+// 	$("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
+// 	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
+// 	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+// }
 
 
 
