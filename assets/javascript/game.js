@@ -17,7 +17,6 @@ var gameData = {
     totalPlayers: 0,
     targetStage: 0,
     currentStage: 0,
-    totalAnswers: 0,
     videoId: '',
     correctAnswer: null,
     clickedAnswer: false,
@@ -109,6 +108,7 @@ gameInfo.on('value', function(splash){
                 //Get random video ID from addvideo.js
                 var newVideo = selectRandomVideo();
                 gameData.videoId = newVideo;
+                gameData.clickedAnswer = false;
                 //Advance the stage
                 gameData.targetStage++;
                 //Hose updates Firebase
@@ -279,6 +279,7 @@ $("#start-button").click(function() {
 $(".answer").on("click", function() {
     if(!gameData.clickedAnswer){
         console.log('clicked answer');
+        gameData.clickedAnswer = true;
 
         //Answer forwarding
         gameData.targetStage++;
