@@ -122,6 +122,8 @@ gameInfo.on('value', function(splash){
             //
         }
     }
+}); 
+
 var timer = 15;
 var intervalID;
 var database = firebase.database();
