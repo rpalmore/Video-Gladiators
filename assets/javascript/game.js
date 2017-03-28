@@ -94,47 +94,52 @@ gameInfo.on('value', function(splash){
         });
     }
 
-    //Get the current stage of the game as stored in Firebase
-    var stage = splash.val().gameStage;
-    console.log('This player is in stage ' + gameData.currentStage + '. They need to be at stage ' + stage + '.');
+    if(gameData.playingGame){
+        //Get the current stage of the game as stored in Firebase
+        var stage = splash.val().gameStage;
+        console.log('This player is in stage ' + gameData.currentStage + '. They need to be at stage ' + stage + '.');
 
-    //If the *player's* current stage is different than the one directed in Firebase, run stage-specific functions
-    if(stage != gameData.currentStage){
-        gameData.currentStage = stage;
+        //If the *player's* current stage is different than the one directed in Firebase, run stage-specific functions
+        if(stage != gameData.currentStage){
+            gameData.currentStage = stage;
 
-        //If target stage == 1, host sends video. Opponent awaits video
-        if(stage === 1){
-            if(gameData.host){
-                //Get random video ID from addvideo.js
-                var newVideo = selectRandomVideo();
-                gameData.videoId = newVideo;
-                gameData.clickedAnswer = false;
-                //Advance the stage
-                gameData.targetStage++;
-                //Hose updates Firebase
-                hostUpdate();
+            //If target stage == 1, host sends video. Opponent awaits video
+            if(stage === 1){
+                if(gameData.host){
+                    //Get random video ID from addvideo.js
+                    var newVideo = selectRandomVideo();
+                    gameData.videoId = newVideo;
+                    gameData.clickedAnswer = false;
+                    //Advance the stage
+                    gameData.targetStage++;
+                    //Hose updates Firebase
+                    hostUpdate();
 
-                console.log('Host has sent a video ID: ' + newVideo);
+                    console.log('Host has sent a video ID: ' + newVideo);
+                }
+
+            //If target stage == 2, both players retrieve video ID pushed in previous stage
+            } else if(stage === 2){
+                //Retrieve video ID for both players
+                gameData.videoId = splash.val().videoId;
+
+                //gameData.correctAnswer will be detailed in video.js / getVideoYear()
+                getVideoYear(gameData.videoId);
+                console.log('Video ID retrieved from server: ' + gameData.videoId);
+
+                //Host advances stage
+                triggerHost()
+            } else if(stage === 3){
+                playVideoById(gameData.videoId);
+                gameData.totalAnswers = 0;
+            } else if(stage === 4){
+                console.log('receive first answer');
+            } else if(stage === 5){
+                console.log('receive second answer');
+                triggerHost();
+            } else if(stage === 6){
+                console.log('check answers');
             }
-
-        //If target stage == 2, both players retrieve video ID pushed in previous stage
-        } else if(stage === 2){
-            //Retrieve video ID for both players
-            gameData.videoId = splash.val().videoId;
-
-            //gameData.correctAnswer will be detailed in video.js / getVideoYear()
-            getVideoYear(gameData.videoId);
-            console.log('Video ID retrieved from server: ' + gameData.videoId);
-
-            //Host advances stage
-            triggerHost()
-        } else if(stage === 3){
-            playVideoById(gameData.videoId);
-            gameData.totalAnswers = 0;
-        } else if(stage === 4){
-            console.log('receive first answer');
-        } else if(stage === 5){
-            console.log('receive second answer');
         }
     }
 }); 
@@ -209,7 +214,7 @@ function enterGame() {
     }
 };
 
-// Action after player 2 signs in and clicks "enter"
+// Action after player 2 signs in and clicks "enter" - only runs once
 function countdown() {
     timer = 5;
     intervalID = setInterval(decrement1, 1000);
@@ -250,14 +255,15 @@ function decrement1() {
 function decrement2() {
     timer--;
     $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
-        if (timer === 0) {
+    if (timer === 0) {
         stop();
         $("#gameTimer").text("Time's up!");
-        setTimeout(startTrivia, 1000 * 3);
+        //setTimeout(startTrivia, 1000 * 3);
     }
 }
 
 function stop() {
+    console.log('stop');
     clearInterval(intervalID);
 }
 
@@ -270,6 +276,15 @@ $("#start-button").click(function() {
     if ($("#username").val() !== "") {
          username = capitalize(($("#userName").val().trim()));
         $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+        $(".welcome").show();
+        enterGame();
+    }
+});
+
+$("#userName").keypress(function(e){
+    if(e.keyCode === 13 && $("#username").val()!==""){
+        username = capitalize($("#userName").val().trim())
         $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
         enterGame();

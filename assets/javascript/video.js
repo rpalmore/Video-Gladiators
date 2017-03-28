@@ -35,6 +35,7 @@ function onPlayerStateChange(event) {
 
 //Initialize the YouTube player
 function onYouTubeIframeAPIReady() {
+	console.log('iframe ready');
 	player = new YT.Player('player', {
 		height: '390',
 		width: '640',
