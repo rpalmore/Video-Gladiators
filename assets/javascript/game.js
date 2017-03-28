@@ -10,29 +10,24 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 //Game status database references
-var gameInfo = database.ref('/gameinfo');
+var gameInfo = database.ref('/gameInfo');
 
-//Player data stores the player number and whether or not they are the host player (player 1 only)
-var playerData = {
-    playerNum: null,
-    host: null
-}
-
-//Game data includes staging information about current play round
+//Game data stores local data for the player
 var gameData = {
     totalPlayers: 0,
     targetStage: 0,
     currentStage: 0,
+    currentAnswers: 0,
     videoId: '',
     correctAnswer: null,
+    playerNum: null,
+    host: null
 }
 
-// Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
-// 5 = 1 answer, 6 = both answers, 7 = calc answers
-
+//Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(){
     //The function is called by both players but only the host player will send game data
-    if(playerData.host){
+    if(gameData.host){
         //Send current game info to Firebase if player is the host
         gameInfo.set({
             gameStage: gameData.targetStage,
@@ -42,17 +37,43 @@ function hostUpdate(){
     }
 }
 
+//Shortcut function to advance game stage and trigger hostUpdate
 function triggerHost(){
-    if(playerData.host){
+    if(gameData.host){
         gameData.targetStage++;
         hostUpdate();
     }
 }
 
+var generate_multipleChoices = function(correct_answer){
+    multipleChoices = [correct_answer];
+    var index = 0;
+    while (index < 3){
+        var randomNumber = correct_answer + math.randomInt(-10,10);
+        if (multipleChoices.indexOf(randomNumber) === -1){
+            multipleChoices.push(randomNumber);
+            index ++;
+        }
+    }
+    multipleChoices.sort();
+}
+
+var AddChoice_to_DOM =  function(){
+    $("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
+    $("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
+    $("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
+    $("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+}
+
 //Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
+// Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
+// 5 = 1 answer, 6 = both answers, 7 = show answers, 8 = reset to 1
+
 gameInfo.on('value', function(splash){
     //On first load (no players) reset game stage to 0
     if(currentPlayers == null){
+        gameData.targetStage = 0;
+        gameData.currentStage = 0;
         gameInfo.update({
             gameStage: 0
         });
@@ -68,7 +89,7 @@ gameInfo.on('value', function(splash){
 
         //If target stage == 1, host sends video. Opponent awaits video
         if(stage === 1){
-            if(playerData.host){
+            if(gameData.host){
                 //Get random video ID from addvideo.js
                 var newVideo = selectRandomVideo();
                 gameData.videoId = newVideo;
@@ -116,52 +137,16 @@ var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
 
-// A few divs we have to hide at the start of the game
-
-$(".main, .welcome").hide();
-
-// Action when player 1 clicks "enter the arena"
-
-$("#start-button").click(function() {
-    if ($("#username").val() !== "") {
-        username = ($("#userName").val().trim());
-        $("#start-button, #userName").hide();
-        $(".jumbotron, video").slideUp(1000);
-        $(".welcome").show();
-        enterGame();
-    }
-});
-
-// Writing usernames to the DOM
-if (playerOneOnline) {
-    $("#player1-name").text(playerOneData.name);
-    $("#player1-wins").text("WINS : " + playerOneData.wins);
-    $("#player1-losses").text("LOSSES : " + playerOneData.losses);
-} else {
-    $("#player1-name").text("DISCONNECTED");
-    $("#player1-wins").text("x");
-    $("#player1-losses").text("x");
-}
-if (playerTwoOnline) {
-    $("#player2-name").text(playerTwoData.name);
-    $("#player2-wins").text("WINS : " + playerTwoData.wins);
-    $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
-} else {
-    $("#player2-name").text("DISCONNECTED");
-    $("#player2-wins").text("x");
-    $("#player2-losses").text("x");
-}
-
 // Display player 1 username in "welcome" div
 function enterGame() {
     if (currentPlayers < 2) {
         if (playerOneOnline) {
             playerNum = 2;
-            playerData.host = false;
+            gameData.host = false;
         }
         else {
             playerNum = 1;
-            playerData.host = true;
+            gameData.host = true;
             //Call hostUpdate to reset Firebase to default values
             hostUpdate();
         }
@@ -198,6 +183,7 @@ playersTree.on("value", function(snapshot) {
     } else if (playersTree.onDisconnect()) {
         console.log("player was disconnected!");
     }
+});
 
 // Action after player 2 signs in and clicks "enter"
 function countdown() {
@@ -210,19 +196,8 @@ function countdown() {
     $(".answerPlaceholder").empty();
 }
 
-// This is our timer countdown function for the pre-game clock
-function decrement1() {
-    timer--;
-    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
-        if (timer === 0) {
-            stop();
-            startTrivia();
-        }
-}
-
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
-
 function startTrivia() {
     timer = 15;
     intervalID = setInterval(decrement2, 1000);
@@ -237,8 +212,17 @@ function startTrivia() {
     hostUpdate();
 }
 
-// This is the clock counting down and restarting
+// This is our timer countdown function for the pre-game clock
+function decrement1() {
+    timer--;
+    $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
+        if (timer === 0) {
+            stop();
+            startTrivia();
+        }
+}
 
+// This is the clock counting down and restarting
 function decrement2() {
     timer--;
     $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
@@ -253,7 +237,37 @@ function stop() {
     clearInterval(intervalID);
 }
 
-// Some button styles
+//Add button clicks
+
+// Action when player 1 clicks "enter the arena"
+$("#start-button").click(function() {
+    if ($("#username").val() !== "") {
+        username = ($("#userName").val().trim());
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+        $(".welcome").show();
+        enterGame();
+    }
+});
+
+$(".answer").on("click", "p", function() {
+    console.log('clicked answer');
+    total_answer ++;
+    if ($(this).text().trim()==1998){
+            correct_answer ++;
+            playerTree.update({
+            wins: correct_answer,
+            losses: total_answer - correct_answer
+            });
+        } else{
+            playerTree.update({
+            wins:correct_answer,
+            losses:total_answer - correct_answer
+        });
+    }
+});
+
+// Add button styles
 $("#start-button").hover(function(){
     $(this).css("background-color", "#fdd865");
     }, function(){
@@ -266,27 +280,26 @@ $("#userName").hover(function(){
         $(this).css("background-color", "white");
 });
 
-});
+// A few divs we have to hide at the start of the game
+$(".main, .welcome").hide();
 
-var generate_multipleChoices = function(correct_answer){
-    multipleChoices = [correct_answer];
-    var index = 0;
-    while (index < 3){
-        var randomNumber = correct_answer + math.randomInt(-10,10);
-        if (multipleChoices.indexOf(randomNumber) === -1){
-            multipleChoices.push(randomNumber);
-            index ++;
-        }
-    }
-    multipleChoices.sort();
+// Writing usernames to the DOM
+if (playerOneOnline) {
+    $("#player1-name").text(playerOneData.name);
+    $("#player1-wins").text("WINS : " + playerOneData.wins);
+    $("#player1-losses").text("LOSSES : " + playerOneData.losses);
+} else {
+    $("#player1-name").text("DISCONNECTED");
+    $("#player1-wins").text("x");
+    $("#player1-losses").text("x");
 }
-
-var AddChoice_to_DOM =  function(){
-	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
-	$("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
-	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
-	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+if (playerTwoOnline) {
+    $("#player2-name").text(playerTwoData.name);
+    $("#player2-wins").text("WINS : " + playerTwoData.wins);
+    $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
+} else {
+    $("#player2-name").text("DISCONNECTED");
+    $("#player2-wins").text("x");
+    $("#player2-losses").text("x");
 }
-
-
 

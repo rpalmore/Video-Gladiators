@@ -135,8 +135,8 @@ playersTree.on("value", function(snapshot) {
 
 });
 
-
-$("#answer").on("click", "p", function() {
+//Add button clicks to answer
+$(".answer").on("click", function() {
     total_answer ++;
     if ($(this).text().trim()==1998){
        correct_answer ++;
@@ -151,8 +151,7 @@ $("#answer").on("click", "p", function() {
             losses:total_answer - correct_answer
         })
     }
-
-    });
+});
 	
 var AddChoice_to_DOM =  function(){
 	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
@@ -160,15 +159,7 @@ var AddChoice_to_DOM =  function(){
 	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
 	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
 }
-AddChoice_to_DOM();
 
-$("#answer").on("click", "p", function(){
-	$("#answer p").children("i").attr("class","fa fa-circle-o fa-1.5x")
-	$(this).children("i").attr("class","fa fa-dot-circle-o fa-1.5x");
-	playerTree.update({
-		answer: parseInt($(this).text().trim())
-	})
-});
 
 
 
