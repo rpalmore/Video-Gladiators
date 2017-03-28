@@ -20,9 +20,26 @@ var gameData = {
     currentAnswers: 0,
     videoId: '',
     correctAnswer: null,
+    clickedAnswer: false,
+    playingGame: false,
     playerNum: null,
     host: null
 }
+
+var timer = 15;
+var intervalID;
+var playersTree = database.ref("players");
+var answersTree =  database.ref("answers");
+var currentPlayers = null;
+var username = "User";
+var playerOneOnline = false;
+var playerTwoOnline = false;
+var playerOneData = null;
+var playerTwoData = null;
+var playerNum = null;
+var total_answer = 0;
+var correct_answer = 0;
+var multipleChoices = [];
 
 //Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(){
@@ -59,10 +76,9 @@ var generate_multipleChoices = function(correct_answer){
 }
 
 var AddChoice_to_DOM =  function(){
-    $("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
-    $("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
-    $("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
-    $("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+    for(var i = 1; i <= 4; i++){
+        $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
+    }
 }
 
 //Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
@@ -116,26 +132,12 @@ gameInfo.on('value', function(splash){
             playVideoById(gameData.videoId);
             triggerHost();
         } else if(stage === 4){
-            console.log('awaiting first answer');
-            //Check button clicks
+            console.log('receive first answer');
+        } else if(stage === 5){
+            console.log('receive second answer');
         }
     }
 }); 
-
-var timer = 15;
-var intervalID;
-var playersTree = database.ref("players");
-var answersTree =  database.ref("answers");
-var currentPlayers = null;
-var username = "User";
-var playerOneOnline = false;
-var playerTwoOnline = false;
-var playerOneData = null;
-var playerTwoData = null;
-var playerNum = null;
-var total_answer = 0;
-var correct_answer = 0;
-var multipleChoices = [];
 
 // Display player 1 username in "welcome" div
 function enterGame() {
@@ -175,13 +177,33 @@ playersTree.on("value", function(snapshot) {
     playerOneData = snapshot.child("1").val();
     playerTwoData = snapshot.child("2").val();
     
-    if (currentPlayers === 2) {
+    if (currentPlayers === 2 && !gameData.playingGame) {
+        gameData.playingGame = true;
         countdown();
         $("#login-switch").hide();
         $("#start-button, #userName").hide();
         $(".welcome").hide();
     } else if (playersTree.onDisconnect()) {
         console.log("player was disconnected!");
+    }
+
+    if (playerOneOnline) {
+        $("#player1-name").text(playerOneData.name);
+        $("#player1-wins").text("WINS : " + playerOneData.wins);
+        $("#player1-losses").text("LOSSES : " + playerOneData.losses);
+    } else {
+        $("#player1-name").text("DISCONNECTED");
+        $("#player1-wins").text("x");
+        $("#player1-losses").text("x");
+    }
+    if (playerTwoOnline) {
+        $("#player2-name").text(playerTwoData.name);
+        $("#player2-wins").text("WINS : " + playerTwoData.wins);
+        $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
+    } else {
+        $("#player2-name").text("DISCONNECTED");
+        $("#player2-wins").text("x");
+        $("#player2-losses").text("x");
     }
 });
 
@@ -237,7 +259,9 @@ function stop() {
     clearInterval(intervalID);
 }
 
-//Add button clicks
+function capitalize(name){
+    return name.charAt(0).toUpperCase()+ name.slice(1);
+ }
 
 // Action when player 1 clicks "enter the arena"
 $("#start-button").click(function() {
@@ -250,20 +274,22 @@ $("#start-button").click(function() {
     }
 });
 
-$(".answer").on("click", "p", function() {
-    console.log('clicked answer');
-    total_answer ++;
-    if ($(this).text().trim()==1998){
-            correct_answer ++;
-            playerTree.update({
-            wins: correct_answer,
-            losses: total_answer - correct_answer
+$(".answer").on("click", function() {
+    if(!gameData.clickedAnswer){
+        console.log('clicked answer');
+        total_answer ++;
+        if ($(this).text().trim()==gameData.correctAnswer){
+                correct_answer ++;
+                playerTree.update({
+                wins: correct_answer,
+                losses: total_answer - correct_answer
+                });
+            } else{
+                playerTree.update({
+                wins:correct_answer,
+                losses:total_answer - correct_answer
             });
-        } else{
-            playerTree.update({
-            wins:correct_answer,
-            losses:total_answer - correct_answer
-        });
+        }
     }
 });
 
@@ -284,22 +310,5 @@ $("#userName").hover(function(){
 $(".main, .welcome").hide();
 
 // Writing usernames to the DOM
-if (playerOneOnline) {
-    $("#player1-name").text(playerOneData.name);
-    $("#player1-wins").text("WINS : " + playerOneData.wins);
-    $("#player1-losses").text("LOSSES : " + playerOneData.losses);
-} else {
-    $("#player1-name").text("DISCONNECTED");
-    $("#player1-wins").text("x");
-    $("#player1-losses").text("x");
-}
-if (playerTwoOnline) {
-    $("#player2-name").text(playerTwoData.name);
-    $("#player2-wins").text("WINS : " + playerTwoData.wins);
-    $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
-} else {
-    $("#player2-name").text("DISCONNECTED");
-    $("#player2-wins").text("x");
-    $("#player2-losses").text("x");
-}
+
 

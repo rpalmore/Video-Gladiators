@@ -63,25 +63,25 @@ function loadVideos(){
 		method: 'GET'
 	}).done(function(response){
 		items = response.items[0].contentDetails.itemCount;
-	});
 
-	//Now that number of items are known, add the individual items to the videoList array in videoPlayer
-	queryURL = 'https://www.googleapis.com/youtube/v3/playlistItems';
-	queryURL += '?key=' + videoPlayer.key;
-	queryURL += '&part=contentDetails&playlistId='+videoPlayer.playlistId+'&maxResults=50';
+		//Now that number of items are known, add the individual items to the videoList array in videoPlayer
+		var queryURL = 'https://www.googleapis.com/youtube/v3/playlistItems';
+		queryURL += '?key=' + videoPlayer.key;
+		queryURL += '&part=contentDetails&playlistId='+videoPlayer.playlistId+'&maxResults=50';
 
-	$.ajax({
-		url: queryURL,
-		method: 'GET'
-	}).done(function(response){
-		//Load each video into the videoList array
-		for(var i = 0; i < items; i++){
-			//For now, cut at 50 (page item limit for YouTube response)
-			if(i === 50){
-				break;
+		$.ajax({
+			url: queryURL,
+			method: 'GET'
+		}).done(function(response){
+			//Load each video into the videoList array
+			for(var i = 0; i < items; i++){
+				//For now, cut at 50 (page item limit for YouTube response)
+				if(i === 50){
+					break;
+				}
+				videoPlayer.videoList.push(response.items[i].contentDetails.videoId);
 			}
-			videoPlayer.videoList.push(response.items[i].contentDetails.videoId);
-		}
+		});
 	});
 }
 

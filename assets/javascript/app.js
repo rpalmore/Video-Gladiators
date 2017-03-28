@@ -1,42 +1,42 @@
-var config = {
-    apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
-    authDomain: "musicchallenge-86176.firebaseapp.com",
-    databaseURL: "https://musicchallenge-86176.firebaseio.com",
-    storageBucket: "musicchallenge-86176.appspot.com",
-    messagingSenderId: "666483398318"
-  };
+// var config = {
+//     apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
+//     authDomain: "musicchallenge-86176.firebaseapp.com",
+//     databaseURL: "https://musicchallenge-86176.firebaseio.com",
+//     storageBucket: "musicchallenge-86176.appspot.com",
+//     messagingSenderId: "666483398318"
+//   };
   
 
-firebase.initializeApp(config);
+// firebase.initializeApp(config);
 
-var database = firebase.database();
-var playersTree = database.ref("players");
-var currentPlayers = null;
-var username = "User";
-var playerOneOnline = false;
-var playerTwoOnline = false;
-var playerOneData = null;
-var playerTwoData = null;
-var playerNum = null;
-var total_answer = 0;
-var correct_answer = 0;
-var multipleChoices;
+// var database = firebase.database();
+// var playersTree = database.ref("players");
+// var currentPlayers = null;
+// var username = "User";
+// var playerOneOnline = false;
+// var playerTwoOnline = false;
+// var playerOneData = null;
+// var playerTwoData = null;
+// var playerNum = null;
+// var total_answer = 0;
+// var correct_answer = 0;
+// var multipleChoices;
 
 
-var generate_multipleChoices = function(correct_answer){
-    multipleChoices = [correct_answer];
-    var index = 0;
-    while (index < 3){
-        var randomNumber = correct_answer + math.randomInt(-10,10);
-        if (multipleChoices.indexOf(randomNumber) === -1){
-            multipleChoices.push(randomNumber);
-            index ++;
-        }
-    }
-    return multipleChoices.sort();
-}
+// var generate_multipleChoices = function(correct_answer){
+//     multipleChoices = [correct_answer];
+//     var index = 0;
+//     while (index < 3){
+//         var randomNumber = correct_answer + math.randomInt(-10,10);
+//         if (multipleChoices.indexOf(randomNumber) === -1){
+//             multipleChoices.push(randomNumber);
+//             index ++;
+//         }
+//     }
+//     return multipleChoices.sort();
+// }
 
-generate_multipleChoices(1998);
+// generate_multipleChoices(1998);
 
 
 $("#start-button").click(function() {
