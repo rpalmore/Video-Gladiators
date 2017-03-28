@@ -27,7 +27,8 @@ var gameData = {
     correctAnswer: null,
 }
 
-// //Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
+// Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
+// 5 = 1 answer, 6 = both answers, 7 = calc answers
 
 function hostUpdate(){
     //The function is called by both players but only the host player will send game data
@@ -41,8 +42,22 @@ function hostUpdate(){
     }
 }
 
+function triggerHost(){
+    if(playerData.host){
+        gameData.targetStage++;
+        hostUpdate();
+    }
+}
+
 //Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
 gameInfo.on('value', function(splash){
+    //On first load (no players) reset game stage to 0
+    if(currentPlayers == null){
+        gameInfo.update({
+            gameStage: 0
+        });
+    }
+
     //Get the current stage of the game as stored in Firebase
     var stage = splash.val().gameStage;
     console.log('This player is in stage ' + gameData.currentStage + '. They need to be at stage ' + stage + '.');
@@ -56,7 +71,6 @@ gameInfo.on('value', function(splash){
             if(playerData.host){
                 //Get random video ID from addvideo.js
                 var newVideo = selectRandomVideo();
-                console.log(newVideo);
                 gameData.videoId = newVideo;
                 //Advance the stage
                 gameData.targetStage++;
@@ -71,20 +85,18 @@ gameInfo.on('value', function(splash){
             //Retrieve video ID for both players
             gameData.videoId = splash.val().videoId;
 
-            //Set the correct answer as the year the video was published (via addvideo.js)
+            //gameData.correctAnswer will be detailed in video.js / getVideoYear()
             getVideoYear(gameData.videoId);
             console.log('Video ID retrieved from server: ' + gameData.videoId);
 
             //Host advances stage
-            if(playerData.host){
-                gameData.targetStage++;
-                hostUpdate();
-            }
+            triggerHost()
         } else if(stage === 3){
             playVideoById(gameData.videoId);
-            //gameData.correctAnswer will be detailed in video.js / getVideoYear()
+            triggerHost();
         } else if(stage === 4){
-            //
+            console.log('awaiting first answer');
+            //Check button clicks
         }
     }
 }); 
@@ -149,7 +161,7 @@ function enterGame() {
         }
         else {
             playerNum = 1;
-             playerData.host = true;
+            playerData.host = true;
             //Call hostUpdate to reset Firebase to default values
             hostUpdate();
         }
@@ -161,16 +173,12 @@ function enterGame() {
             losses: 0
         });
 
-    playerTree.onDisconnect().remove();
+        playerTree.onDisconnect().remove();
 
-    $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
-
-    }
-
-    else {
+        $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
+    } else {
         alert("NO MORE SPACE");
     }
-
 };
 
 playersTree.on("value", function(snapshot) {
