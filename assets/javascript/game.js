@@ -134,11 +134,28 @@ gameInfo.on('value', function(splash){
                 gameData.totalAnswers = 0;
             } else if(stage === 4){
                 console.log('receive first answer');
+                //No actions in this stage
             } else if(stage === 5){
                 console.log('receive second answer');
                 triggerHost();
             } else if(stage === 6){
                 console.log('check answers');
+                //Stop timer
+                stop();
+                //Display answers
+                $("#gameTimer").text('Round complete');
+                $("#question").text("Next round about to begin!");
+                setTimeout(startTrivia, 1000 * 3);
+            } else if(stage === 7){
+                //If 15 answers not completed, reset to stage 1
+                if(total_answer != 15){
+                    gameData.targetStage = 0;
+                }
+                triggerHost();
+            } else if(stage === 8){
+                console.log('Game over');
+                $("#question").text("Game over!");
+                stop();
             }
         }
     }
@@ -228,6 +245,7 @@ function countdown() {
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
 function startTrivia() {
+    console.log('start trivia')
     timer = 15;
     intervalID = setInterval(decrement2, 1000);
     $("#question").text("What year was this video released?");
@@ -237,6 +255,7 @@ function startTrivia() {
     $(".answer, .score, #player").show();
 
     //With 2 players, trigger hostUpdate() to start game stage advancing
+    gameData.clickedAnswer = false;
     gameData.targetStage++;
     hostUpdate();
 }
@@ -256,8 +275,26 @@ function decrement2() {
     timer--;
     $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
     if (timer === 0) {
+        //If timer runs our, player automatically loses round
         stop();
+        //Don't allow for any more clicks
+        gameData.clickedAnswer = true;
+
+        //Force incorrect answer
+        total_answer ++;
+        playerTree.update({
+            wins:correct_answer,
+            losses:total_answer - correct_answer
+        });
+
+        //Force stage to advance
+        gameData.targetStage++;
+        gameInfo.update({
+            gameStage: gameData.targetStage
+        });
+
         $("#gameTimer").text("Time's up!");
+        //Moved setTimeout into game staging
         //setTimeout(startTrivia, 1000 * 3);
     }
 }
@@ -293,23 +330,27 @@ $("#userName").keypress(function(e){
 
 $(".answer").on("click", function() {
     if(!gameData.clickedAnswer){
-        console.log('clicked answer');
         gameData.clickedAnswer = true;
+        stop();
 
-        //Answer forwarding
+        //Force a single stage update
         gameData.targetStage++;
         gameInfo.update({
             gameStage: gameData.targetStage
         });
 
+        $("#gameTimer").text('Waiting for other player...');
+
         total_answer ++;
         if ($(this).text().trim()==gameData.correctAnswer){
+            $("#question").text("You're correct!");
             correct_answer ++;
             playerTree.update({
                 wins: correct_answer,
                 losses: total_answer - correct_answer
             });
         } else {
+            $("#question").text("Wrong! The correct answer is " + gameData.correctAnswer);
             playerTree.update({
                 wins:correct_answer,
                 losses:total_answer - correct_answer
