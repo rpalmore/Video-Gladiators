@@ -8,7 +8,9 @@ var config = {
 };
 firebase.initializeApp(config);
 
-//References for players, game, and connections
+var database = firebase.database();
+
+// References for players, game, and connections
 var playersRef = database.ref('/players');
 var gameInfo = database.ref('/gameinfo');
 var connectedRef = database.ref(".info/connected");
@@ -28,41 +30,33 @@ var gameData = {
     correctAnswer: null
 }
 
-//Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = show answers
-
-//Add listener for new players
-connectedRef.on("value", function(snap) {
-    if (snap.val()) {
-        var con = playersRef.push(true);
-        con.onDisconnect().remove();
-    }
-});
+// //Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = show answers
 
 //When player joins game, modifies their player data
-playersRef.on("value", function(snap) {
-    gameData.totalPlayers = snap.numChildren();
+// playersRef.on("value", function(snap) {
+//     gameData.totalPlayers = snap.numChildren();
 
-    //If player has not yet been assigned a player number...
-    if(playerData.playerNum == null){
-        //Assign current player number to player info
-        playerData.playerNum = gameData.totalPlayers;
-        if(playerData.playerNum === 1){
-            playerData.host = true;
-            //Call hostUpdate to reset Firebase to default values
-            hostUpdate();
-        } else {
-            playerData.host = false;
-        }
-    }
+//     //If player has not yet been assigned a player number...
+//     if(playerData.playerNum == null){
+//         //Assign current player number to player info
+//         playerData.playerNum = gameData.totalPlayers;
+//         if(playerData.playerNum === 1){
+//             playerData.host = true;
+//             //Call hostUpdate to reset Firebase to default values
+//             hostUpdate();
+//         } else {
+//             playerData.host = false;
+//         }
+//     }
 
-    //If 2 players are available, the host player calls to start the game
-    if(gameData.totalPlayers === 2 && playerData.host){
-        //Advance the target game stage
-        gameData.targetStage++;
-        //With 2 players, trigger hostUpdate() to start game stage advancing
-        hostUpdate();
-    }
-});
+//     //If 2 players are available, the host player calls to start the game
+//     if(gameData.totalPlayers === 2 && playerData.host){
+//         //Advance the target game stage
+//         gameData.targetStage++;
+//         //With 2 players, trigger hostUpdate() to start game stage advancing
+//         hostUpdate();
+//     }
+// });
 
 function hostUpdate(){
     //The function is called by both players but only the host player will send game data
@@ -126,7 +120,6 @@ gameInfo.on('value', function(splash){
 
 var timer = 15;
 var intervalID;
-var database = firebase.database();
 var playersTree = database.ref("players");
 var answersTree =  database.ref("answers");
 var currentPlayers = null;
@@ -162,9 +155,13 @@ function enterGame() {
     if (currentPlayers < 2) {
         if (playerOneOnline) {
             playerNum = 2;
+            playerData.host = false;
         }
         else {
             playerNum = 1;
+             playerData.host = true;
+            //Call hostUpdate to reset Firebase to default values
+            hostUpdate();
         }
     
 
@@ -189,7 +186,6 @@ function enterGame() {
 };
 
 playersTree.on("value", function(snapshot) {
-
     // scoreBoard();
 
     currentPlayers = snapshot.numChildren();
@@ -269,6 +265,10 @@ function startTrivia() {
     $("#timer").hide();
     $(".answerPlaceholder").remove();
     $(".answer, .score, #video-player").show();
+
+    //With 2 players, trigger hostUpdate() to start game stage advancing
+    gameData.targetStage++;
+    hostUpdate();
 }
 
 // This is the clock counting down and restarting
