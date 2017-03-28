@@ -39,8 +39,6 @@ var generate_multipleChoices = function(correct_answer){
 generate_multipleChoices(1998);
 
 
-
-
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
         username = capitalize(($("#userName").val().trim()));
@@ -69,9 +67,7 @@ function enterGame() {
             playerNum = 1;
         }
     
-
         playerTree = database.ref("/players/" + playerNum);
-
         playerTree.set({
             name: username,
             wins: 0,

@@ -123,18 +123,9 @@ function getVideoYear(vidId){
 		year = response.items[0].snippet.publishedAt;
 		year = parseInt(year.substr(0, 4));
 		gameData.correctAnswer = year;
+		generate_multipleChoices(year);
+		AddChoice_to_DOM();
 	});
 }
-
-//For testing
-function playbtn(){
-	var vidId = selectRandomVideo();
-	playVideoById(vidId);
-}
-
-$(document).ready(function(){
-	$('#play-song').on('click', playbtn);
-	loadVideos();
-});
 
 loadVideos();

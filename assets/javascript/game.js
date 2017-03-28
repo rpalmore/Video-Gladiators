@@ -9,7 +9,7 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
-//Game status database reference
+//Game status database references
 var gameInfo = database.ref('/gameinfo');
 
 //Player data stores the player number and whether or not they are the host player (player 1 only)
@@ -27,7 +27,7 @@ var gameData = {
     correctAnswer: null,
 }
 
-// //Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = show answers
+// //Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
 
 function hostUpdate(){
     //The function is called by both players but only the host player will send game data
@@ -82,7 +82,7 @@ gameInfo.on('value', function(splash){
             }
         } else if(stage === 3){
             playVideoById(gameData.videoId);
-
+            //gameData.correctAnswer will be detailed in video.js / getVideoYear()
         } else if(stage === 4){
             //
         }
@@ -102,6 +102,7 @@ var playerTwoData = null;
 var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
+var multipleChoices = [];
 
 // A few divs we have to hide at the start of the game
 
@@ -119,8 +120,27 @@ $("#start-button").click(function() {
     }
 });
 
-// Display player 1 username in "welcome" div
+// Writing usernames to the DOM
+if (playerOneOnline) {
+    $("#player1-name").text(playerOneData.name);
+    $("#player1-wins").text("WINS : " + playerOneData.wins);
+    $("#player1-losses").text("LOSSES : " + playerOneData.losses);
+} else {
+    $("#player1-name").text("DISCONNECTED");
+    $("#player1-wins").text("x");
+    $("#player1-losses").text("x");
+}
+if (playerTwoOnline) {
+    $("#player2-name").text(playerTwoData.name);
+    $("#player2-wins").text("WINS : " + playerTwoData.wins);
+    $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
+} else {
+    $("#player2-name").text("DISCONNECTED");
+    $("#player2-wins").text("x");
+    $("#player2-losses").text("x");
+}
 
+// Display player 1 username in "welcome" div
 function enterGame() {
     if (currentPlayers < 2) {
         if (playerOneOnline) {
@@ -172,7 +192,6 @@ playersTree.on("value", function(snapshot) {
     }
 
 // Action after player 2 signs in and clicks "enter"
-
 function countdown() {
     timer = 5;
     intervalID = setInterval(decrement1, 1000);
@@ -183,32 +202,7 @@ function countdown() {
     $(".answerPlaceholder").empty();
 }
 
-// Writing usernames to the DOM
-if (playerOneOnline) {
-        $("#player1-name").text(playerOneData.name);
-        $("#player1-wins").text("WINS : " + playerOneData.wins);
-        $("#player1-losses").text("LOSSES : " + playerOneData.losses);
-    }
-    else {
-        $("#player1-name").text("DISCONNECTED");
-        $("#player1-wins").text("x");
-        $("#player1-losses").text("x");
-    }
-
-    if (playerTwoOnline) {
-        $("#player2-name").text(playerTwoData.name);
-        $("#player2-wins").text("WINS : " + playerTwoData.wins);
-        $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
-    }
-    else {
-        $("#player2-name").text("DISCONNECTED");
-        $("#player2-wins").text("x");
-        $("#player2-losses").text("x");
-    }
-
-
 // This is our timer countdown function for the pre-game clock
-
 function decrement1() {
     timer--;
     $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
@@ -252,7 +246,6 @@ function stop() {
 }
 
 // Some button styles
-
 $("#start-button").hover(function(){
     $(this).css("background-color", "#fdd865");
     }, function(){
@@ -266,3 +259,26 @@ $("#userName").hover(function(){
 });
 
 });
+
+var generate_multipleChoices = function(correct_answer){
+    multipleChoices = [correct_answer];
+    var index = 0;
+    while (index < 3){
+        var randomNumber = correct_answer + math.randomInt(-10,10);
+        if (multipleChoices.indexOf(randomNumber) === -1){
+            multipleChoices.push(randomNumber);
+            index ++;
+        }
+    }
+    multipleChoices.sort();
+}
+
+var AddChoice_to_DOM =  function(){
+	$("#answer1").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[0]);
+	$("#answer2").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[1]);
+	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
+	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
+}
+
+
+
