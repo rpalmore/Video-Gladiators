@@ -53,9 +53,9 @@ $("#userName").keypress(function(e){
     }
 });
 
-function capitalize(name){
-    return name.charAt(0).toUpperCase()+ name.slice(1);
- }
+// function capitalize(name){
+//     return name.charAt(0).toUpperCase()+ name.slice(1);
+//  }
 
 function enterGame() {
 
@@ -159,17 +159,3 @@ $(".answer").on("click", function() {
 // 	$("#answer3").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[2]);
 // 	$("#answer4").html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[3]);
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

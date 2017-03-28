@@ -37,6 +37,9 @@ function onPlayerStateChange(event) {
 function onYouTubeIframeAPIReady() {
 	console.log('iframe ready');
 	player = new YT.Player('player', {
+		playerVars: {
+		    modestbranding: true
+		},
 		height: '390',
 		width: '640',
 		videoId: '',

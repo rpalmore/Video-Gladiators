@@ -134,7 +134,9 @@ gameInfo.on('value', function(splash){
                 gameData.totalAnswers = 0;
             } else if(stage === 4){
                 console.log('receive first answer');
-                //No actions in this stage
+                if(gameData.clickedAnswer){
+                    $("#gameTimer").text('Waiting for other player...');
+                }
             } else if(stage === 5){
                 console.log('receive second answer');
                 triggerHost();
@@ -142,9 +144,7 @@ gameInfo.on('value', function(splash){
                 console.log('check answers');
                 //Stop timer
                 stop();
-                //Display answers
-                $("#gameTimer").text('Round complete');
-                $("#question").text("Next round about to begin!");
+                $("#gameTimer").text("Next round about to begin!");
                 setTimeout(startTrivia, 1000 * 3);
             } else if(stage === 7){
                 //If 15 answers not completed, reset to stage 1
@@ -338,8 +338,6 @@ $(".answer").on("click", function() {
         gameInfo.update({
             gameStage: gameData.targetStage
         });
-
-        $("#gameTimer").text('Waiting for other player...');
 
         total_answer ++;
         if ($(this).text().trim()==gameData.correctAnswer){
