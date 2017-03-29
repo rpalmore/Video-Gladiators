@@ -75,76 +75,64 @@ var AddChoice_to_DOM =  function(){
     }
 }
 
-//Whenever gameStatus is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
-// Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
-// 5 = 1 answer, 6 = both answers, 7 = show answers, 8 = reset to 1
-
 gameStatus.on('value', function(splash){
-    //On first load (no players) reset game stage to 0
-    // if(currentPlayers == null){
-    //     gameData.targetStage = 0;
-    //     gameData.currentStage = 0;
-    //     gameStatus.update({
-    //         gameStage: 0
-    //     });
-    // }
-
     if(gameData.playingGame){
         //Get the current stage of the game as stored in Firebase
         var stage = splash.val().gameStage;
-        console.log('This player is in stage ' + gameData.currentStage + '. They need to be at stage ' + stage + '.');
 
-        //If the *player's* current stage is different than the one directed in Firebase, run stage-specific functions
+        //If the player's current stage is different than the one directed in Firebase, run stage-specific functions
         if(stage != gameData.currentStage){
             gameData.currentStage = stage;
 
-            //If target stage == 1, host sends video. Opponent awaits video
+            //Stage 1: Host sends video. Opponent awaits video.
             if(stage === 1){
                 if(gameData.host){
-                    //Get random video ID from addvideo.js
+                    //Get random video ID from video.js
                     var newVideo = selectRandomVideo();
                     gameData.videoId = newVideo;
                     gameData.clickedAnswer = false;
-                    //Advance the stage
                     hostUpdate(1);
-
-                    console.log('Host has sent a video ID: ' + newVideo);
                 }
 
-            //If target stage == 2, both players retrieve video ID pushed in previous stage
+            //Stage 2: Both players retrieve video ID pushed to Firebase in previous stage
             } else if(stage === 2){
                 //Retrieve video ID for both players
                 gameData.videoId = splash.val().videoId;
 
                 //gameData.correctAnswer will be detailed in video.js / getVideoYear()
                 getVideoYear(gameData.videoId);
-                console.log('Video ID retrieved from server: ' + gameData.videoId);
-
-                //Host advances stage
                 hostUpdate(1)()
+
+            //Stage 3: Begin playing the video and register that no answers have been provided
             } else if(stage === 3){
                 playVideoById(gameData.videoId);
                 gameData.totalAnswers = 0;
+
+            //Stage 4: One answer from either player recieved.
             } else if(stage === 4){
-                console.log('receive first answer');
                 if(gameData.clickedAnswer){
                     $("#gameTimer").text('Waiting for other player...');
                 }
+
+            //Stage 5: Responses from both players received
             } else if(stage === 5){
-                console.log('receive second answer');
-                hostUpdate(1)();
+                hostUpdate(1);
+
+            //Stage 6: Stop timer for both players and countdown to next round
             } else if(stage === 6){
-                console.log('check answers');
-                //Stop timer
                 stop();
                 $("#gameTimer").text("Next round about to begin!");
                 setTimeout(startTrivia, 1000 * 3);
+
+            //Stage 7: Test if max videos viewed
             } else if(stage === 7){
-                //If 15 answers not completed, reset to stage 1
+                //If max answers not completed, reset to stage 1
                 if(total_answer != gameData.maxAnswers){
                     gameData.targetStage = 0;
                 }
-                hostUpdate(1)();
+                hostUpdate(1);
+
+            //Stage 8: Game is over
             } else if(stage === 8){
                 $("#question").text("Game over!");                
                 stop();
@@ -153,6 +141,7 @@ gameStatus.on('value', function(splash){
     }
 }); 
 
+//Occurs
 playersTree.on("value", function(snapshot) {
     console.log('playersTree');
     currentPlayers = snapshot.numChildren();
@@ -288,8 +277,6 @@ function decrement2() {
         });
 
         $("#gameTimer").text("Time's up!");
-        //Moved setTimeout into game staging
-        //setTimeout(startTrivia, 1000 * 3);
     }
 }
 
