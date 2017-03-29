@@ -60,7 +60,7 @@ var generate_multipleChoices = function(correct_answer){
     multipleChoices = [correct_answer];
     var index = 0;
     while (index < 3){
-        var randomNumber = correct_answer + math.randomInt(-5,5);
+        var randomNumber = correct_answer + math.randomInt(-5, 5);
         if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber < 2018){
             multipleChoices.push(randomNumber);
             index ++;
