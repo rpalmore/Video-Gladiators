@@ -85,6 +85,7 @@ var AddChoice_to_DOM =  function(){
 // 5 = 1 answer, 6 = both answers, 7 = show answers, 8 = reset to 1
 
 gameInfo.on('value', function(splash){
+    console.log('gameInfo');
     //On first load (no players) reset game stage to 0
     if(currentPlayers == null){
         gameData.targetStage = 0;
@@ -162,6 +163,7 @@ gameInfo.on('value', function(splash){
 }); 
 
 playersTree.on("value", function(snapshot) {
+    console.log('playersTree');
     currentPlayers = snapshot.numChildren();
     
     playerOneOnline = snapshot.child("1").exists();
@@ -372,7 +374,3 @@ $("#userName").hover(function(){
 
 // A few divs we have to hide at the start of the game
 $(".main, .welcome").hide();
-
-// Writing usernames to the DOM
-
-

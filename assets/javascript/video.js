@@ -6,18 +6,13 @@
 
 //Variables specific to player so as not to pollute global scope
 var videoPlayer = {
-	//API key
 	key: 'AIzaSyApk9cJ6LxO_taHUxiG8kftlhs1ilr7LpQ',
-	//Id of the YouTube playlist to use
 	playlistId: 'PL30BFB50685A0252B',
 	//List will be populated with YouTube video IDs on page load
 	videoList: []
 }
 
-//				<---------------------------->
-//Following functions are YouTube requirements for video playing
-
-//This will hold the player in the DOM. I think it needs to be in the global scope
+//Must be global scope for YouTube
 var player;
 var done = false;
 
@@ -35,7 +30,6 @@ function onPlayerStateChange(event) {
 
 //Initialize the YouTube player
 function onYouTubeIframeAPIReady() {
-	console.log('iframe ready');
 	player = new YT.Player('player', {
 		playerVars: {
 		    modestbranding: true
@@ -50,9 +44,7 @@ function onYouTubeIframeAPIReady() {
 	});
 }
 
-//End YouTube inclusive functions
-//				<---------------------------->
-
+//Adds playlist video IDs to videoList[]
 function loadVideos(){
 	//See how many items are in the playlist.
 	//You have to look at playlist info because you need 'next page token' to continue past 50
