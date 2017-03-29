@@ -76,6 +76,15 @@ var AddChoice_to_DOM =  function(){
 }
 
 gameStatus.on('value', function(splash){
+    //On first load (no players) reset game stage to 0
+    if(currentPlayers == null){
+        gameData.targetStage = 0;
+        gameData.currentStage = 0;
+        gameStatus.update({
+            gameStage: 0
+        });
+    }
+
     if(gameData.playingGame){
         //Get the current stage of the game as stored in Firebase
         var stage = splash.val().gameStage;
@@ -141,9 +150,7 @@ gameStatus.on('value', function(splash){
     }
 }); 
 
-//Occurs
 playersTree.on("value", function(snapshot) {
-    console.log('playersTree');
     currentPlayers = snapshot.numChildren();
     
     playerOneOnline = snapshot.child("1").exists();
