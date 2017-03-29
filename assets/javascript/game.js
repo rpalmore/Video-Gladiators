@@ -1,16 +1,17 @@
 //Configure Firebase connection
 var config = {
-    apiKey: "AIzaSyB6dvUdBGMWjFbn0V6-nd7AAq5iHwoQbJU",
-    authDomain: "megacow-1cf45.firebaseapp.com",
-    databaseURL: "https://megacow-1cf45.firebaseio.com",
-    storageBucket: "megacow-1cf45.appspot.com",
-    messagingSenderId: "182729803547"
+    apiKey: "AIzaSyA7NU6DtU28B200f7z6zBbiZFMUFlPj1lw",
+    authDomain: "videogladiators-81826.firebaseapp.com",
+    databaseURL: "https://videogladiators-81826.firebaseio.com",
+    storageBucket: "videogladiators-81826.appspot.com",
+    messagingSenderId: "1028142233498"
 };
+
 firebase.initializeApp(config);
 var database = firebase.database();
 
 //Game status database references
-var gameInfo = database.ref('/gameInfo');
+var gameStatus = database.ref('/gameStatus');
 
 //Game data stores local data for the player
 var gameData = {
@@ -22,7 +23,8 @@ var gameData = {
     clickedAnswer: false,
     playingGame: false,
     playerNum: null,
-    host: null
+    host: null,
+    maxAnswers: 5
 }
 
 var timer = 15;
@@ -41,23 +43,16 @@ var correct_answer = 0;
 var multipleChoices = [];
 
 //Player 1 (host) updates the relevant data in Firebase
-function hostUpdate(){
+function hostUpdate(stageAddition){
     //The function is called by both players but only the host player will send game data
     if(gameData.host){
-        //Send current game info to Firebase if player is the host
-        gameInfo.set({
+        //Add stages based on parameter
+        gameData.targetStage += stageAddition;
+        //Set info in Firebase
+        gameStatus.set({
             gameStage: gameData.targetStage,
             videoId: gameData.videoId
         });
-        console.log('hostUpdate() called by this player.');
-    }
-}
-
-//Shortcut function to advance game stage and trigger hostUpdate
-function triggerHost(){
-    if(gameData.host){
-        gameData.targetStage++;
-        hostUpdate();
     }
 }
 
@@ -65,8 +60,8 @@ var generate_multipleChoices = function(correct_answer){
     multipleChoices = [correct_answer];
     var index = 0;
     while (index < 3){
-        var randomNumber = correct_answer + math.randomInt(-10,10);
-        if (multipleChoices.indexOf(randomNumber) === -1){
+        var randomNumber = correct_answer + math.randomInt(-5,5);
+        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber < 2018){
             multipleChoices.push(randomNumber);
             index ++;
         }
@@ -80,20 +75,19 @@ var AddChoice_to_DOM =  function(){
     }
 }
 
-//Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
+//Whenever gameStatus is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
 // Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
 // 5 = 1 answer, 6 = both answers, 7 = show answers, 8 = reset to 1
 
-gameInfo.on('value', function(splash){
-    console.log('gameInfo');
+gameStatus.on('value', function(splash){
     //On first load (no players) reset game stage to 0
-    if(currentPlayers == null){
-        gameData.targetStage = 0;
-        gameData.currentStage = 0;
-        gameInfo.update({
-            gameStage: 0
-        });
-    }
+    // if(currentPlayers == null){
+    //     gameData.targetStage = 0;
+    //     gameData.currentStage = 0;
+    //     gameStatus.update({
+    //         gameStage: 0
+    //     });
+    // }
 
     if(gameData.playingGame){
         //Get the current stage of the game as stored in Firebase
@@ -112,9 +106,7 @@ gameInfo.on('value', function(splash){
                     gameData.videoId = newVideo;
                     gameData.clickedAnswer = false;
                     //Advance the stage
-                    gameData.targetStage++;
-                    //Hose updates Firebase
-                    hostUpdate();
+                    hostUpdate(1);
 
                     console.log('Host has sent a video ID: ' + newVideo);
                 }
@@ -129,7 +121,7 @@ gameInfo.on('value', function(splash){
                 console.log('Video ID retrieved from server: ' + gameData.videoId);
 
                 //Host advances stage
-                triggerHost()
+                hostUpdate(1)()
             } else if(stage === 3){
                 playVideoById(gameData.videoId);
                 gameData.totalAnswers = 0;
@@ -140,7 +132,7 @@ gameInfo.on('value', function(splash){
                 }
             } else if(stage === 5){
                 console.log('receive second answer');
-                triggerHost();
+                hostUpdate(1)();
             } else if(stage === 6){
                 console.log('check answers');
                 //Stop timer
@@ -149,13 +141,12 @@ gameInfo.on('value', function(splash){
                 setTimeout(startTrivia, 1000 * 3);
             } else if(stage === 7){
                 //If 15 answers not completed, reset to stage 1
-                if(total_answer != 15){
+                if(total_answer != gameData.maxAnswers){
                     gameData.targetStage = 0;
                 }
-                triggerHost();
+                hostUpdate(1)();
             } else if(stage === 8){
-                console.log('Game over');
-                $("#question").text("Game over!");
+                $("#question").text("Game over!");                
                 stop();
             }
         }
@@ -214,8 +205,10 @@ function enterGame() {
         else {
             playerNum = 1;
             gameData.host = true;
+            gameData.targetStage = 0;
+            gameData.currentStage = 0;
             //Call hostUpdate to reset Firebase to default values
-            hostUpdate();
+            hostUpdate(0);
         }
         playerTree = database.ref("/players/" + playerNum);
 
@@ -258,8 +251,7 @@ function startTrivia() {
 
     //With 2 players, trigger hostUpdate() to start game stage advancing
     gameData.clickedAnswer = false;
-    gameData.targetStage++;
-    hostUpdate();
+    hostUpdate(1);
 }
 
 // This is our timer countdown function for the pre-game clock
@@ -291,7 +283,7 @@ function decrement2() {
 
         //Force stage to advance
         gameData.targetStage++;
-        gameInfo.update({
+        gameStatus.update({
             gameStage: gameData.targetStage
         });
 
@@ -313,7 +305,7 @@ function capitalize(name){
 // Action when player 1 clicks "enter the arena"
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
-         username = capitalize(($("#userName").val().trim()));
+        username = capitalize(($("#userName").val().trim()));
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
@@ -323,7 +315,8 @@ $("#start-button").click(function() {
 
 $("#userName").keypress(function(e){
     if(e.keyCode === 13 && $("#username").val()!==""){
-        username = capitalize($("#userName").val().trim())
+        username = capitalize($("#userName").val().trim());
+        $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
         $(".welcome").show();
         enterGame();
@@ -337,7 +330,7 @@ $(".answer").on("click", function() {
 
         //Force a single stage update
         gameData.targetStage++;
-        gameInfo.update({
+        gameStatus.update({
             gameStage: gameData.targetStage
         });
 
