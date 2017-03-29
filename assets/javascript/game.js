@@ -85,7 +85,7 @@ gameStatus.on('value', function(splash){
         });
     }
 
-    if(gameData.playingGame){
+    if(gameData.playingGame && playerNum != null){
         //Get the current stage of the game as stored in Firebase
         var stage = splash.val().gameStage;
 
@@ -159,16 +159,18 @@ playersTree.on("value", function(snapshot) {
     playerTwoData = snapshot.child("2").val();
     
     if (currentPlayers === 2 && !gameData.playingGame) {
-        gameData.playingGame = true;
-        countdown();
-        $("#login-switch").hide();
-        $("#start-button, #userName").hide();
-        $(".welcome").hide();
+        //Only start the countdown if the player has been assigned a player number
+        if(activePlayer){
+            gameData.playingGame = true;
+            $("#login-switch").hide();
+            $("#start-button, #userName").hide();
+            $(".welcome").hide();
+            countdown();
+        }
     } else if (currentPlayers < 2){
+        //Host player resets game data
         gameData.targetStage = 0;
         gameData.currentStage = 0;
-    } else if (playersTree.onDisconnect()) {
-        console.log("player was disconnected!");
     }
 
     if (playerOneOnline) {
@@ -215,10 +217,10 @@ function enterGame() {
         });
 
         playerTree.onDisconnect().remove();
-
         $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
+
     } else {
-        alert("NO MORE SPACE");
+        console.log(currentPlayers);
     }
 };
 
@@ -294,6 +296,14 @@ function stop() {
 
 function capitalize(name){
     return name.charAt(0).toUpperCase()+ name.slice(1);
+ }
+
+ function activePlayer(){
+    if(playerNum != null && playerNum <= 2){
+        return true;
+    } else {
+        return false;
+    }
  }
 
 // Action when player 1 clicks "enter the arena"
