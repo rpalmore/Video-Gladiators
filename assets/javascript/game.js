@@ -50,7 +50,7 @@ $("#start-button").click(function() {
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
 
-        if(activePlayer()){ 
+        if(playerNum == 1){ 
             $(".welcome").show();
         }
     }
@@ -64,7 +64,7 @@ $("#userName").keypress(function(e){
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
 
-        if(activePlayer()){ 
+        if(playerNum == 1){ 
             $(".welcome").show();
         }
     }
@@ -75,6 +75,7 @@ function capitalize(name){
  }
 
  function activePlayer(){
+    //If player has been assigned number and it is 1 or 2
     if(playerNum != null && playerNum <= 2){
         return true;
     } else {
@@ -207,7 +208,6 @@ gameStatus.on('value', function(splash){
         //If the player's current stage is different than the one directed in Firebase, run stage-specific functions
         if(stage != gameData.currentStage){
             gameData.currentStage = stage;
-
             //Stage 1: Host sends video. Opponent awaits video.
             if(stage === 1){
                 if(gameData.host){
@@ -272,7 +272,8 @@ function countdown() {
     $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");  
     $(".main").show();
     $("#video-placeholder").fadeOut(5000);
-    $("#player, .welcome, .answer, .score").hide();
+    $("#player, .answer, .score").hide();
+    $(".welcome").hide();
     $(".answerPlaceholder").empty();
 }
 
