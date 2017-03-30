@@ -41,96 +41,6 @@ var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
 
-//Runs whenever the game status is updated in Firebase
-gameStatus.on('value', function(splash){
-    //On first load (no players) reset game stage to 0
-    if(currentPlayers == null){
-        gameData.targetStage = 0;
-        gameData.currentStage = 0;
-        gameStatus.update({
-            gameStage: 0
-        });
-    }
-
-    if(gameData.playingGame && playerNum != null){
-        //Get the current stage of the game as stored in Firebase
-        var stage = splash.val().gameStage;
-
-        //If the player's current stage is different than the one directed in Firebase, run stage-specific functions
-        if(stage != gameData.currentStage){
-            gameData.currentStage = stage;
-
-            //Stage 1: Host sends video. Opponent awaits video.
-            if(stage === 1){
-                if(gameData.host){
-                    //Get random video ID from video.js
-                    var newVideo = selectRandomVideo();
-                    gameData.videoId = newVideo;
-                    gameData.clickedAnswer = false;
-                    hostUpdate(1);
-                }
-
-            //Stage 2: Both players retrieve video ID pushed to Firebase in previous stage
-            } else if(stage === 2){
-                //Retrieve video ID for both players
-                gameData.videoId = splash.val().videoId;
-
-                //gameData.correctAnswer will be detailed in video.js / getVideoYear()
-                getVideoYear(gameData.videoId);
-                hostUpdate(1);
-
-            //Stage 3: Begin playing the video and register that no answers have been provided
-            } else if(stage === 3){
-                playVideoById(gameData.videoId);
-                gameData.totalAnswers = 0;
-
-            //Stage 4: One answer from either player recieved.
-            } else if(stage === 4){
-                if(gameData.clickedAnswer){
-                    $("#gameTimer").text('Waiting for other player...');
-                }
-
-            //Stage 5: Responses from both players received
-            } else if(stage === 5){
-                hostUpdate(1);
-
-            //Stage 6: Stop timer for both players and countdown to next round
-            } else if(stage === 6){
-                stop();
-                $("#gameTimer").text("Next round about to begin!");
-                setTimeout(startTrivia, 1000 * 3);
-
-            //Stage 7: Test if max videos viewed
-            } else if(stage === 7){
-                //If max answers not completed, reset to stage 1
-                if(total_answer != gameData.maxAnswers){
-                    gameData.targetStage = 0;
-                }
-                hostUpdate(1);
-
-            //Stage 8: Game is over
-            } else if(stage === 8){
-                $("#question").text("Game over!");                
-                stop();
-            }
-        }
-    }
-}); 
-
-//Player 1 (host) updates the relevant data in Firebase
-function hostUpdate(stageAddition){
-    //The function is called by both players but only the host player will send game data
-    if(gameData.host){
-        //Add stages based on parameter
-        gameData.targetStage += stageAddition;
-        //Set info in Firebase
-        gameStatus.set({
-            gameStage: gameData.targetStage,
-            videoId: gameData.videoId
-        });
-    }
-}
-
 // Action when player 1 clicks "enter the arena"
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
@@ -140,7 +50,6 @@ $("#start-button").click(function() {
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
 
-        console.log(playerNum);
         if(activePlayer()){ 
             $(".welcome").show();
         }
@@ -155,7 +64,6 @@ $("#userName").keypress(function(e){
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
 
-        console.log(playerNum);
         if(activePlayer()){ 
             $(".welcome").show();
         }
@@ -267,6 +175,96 @@ playersTree.on("value", function(snapshot) {
         $("#player2-losses").text("x");
     }
 });
+
+//Player 1 (host) updates the relevant data in Firebase
+function hostUpdate(stageAddition){
+    //The function is called by both players but only the host player will send game data
+    if(gameData.host){
+        //Add stages based on parameter
+        gameData.targetStage += stageAddition;
+        //Set info in Firebase
+        gameStatus.set({
+            gameStage: gameData.targetStage,
+            videoId: gameData.videoId
+        });
+    }
+}
+
+//Runs whenever the game status is updated in Firebase
+gameStatus.on('value', function(splash){
+    //On first load (no players) reset game stage to 0
+    if(currentPlayers == null){
+        gameData.targetStage = 0;
+        gameData.currentStage = 0;
+        gameStatus.update({
+            gameStage: 0
+        });
+    }
+
+    if(gameData.playingGame && playerNum != null){
+        //Get the current stage of the game as stored in Firebase
+        var stage = splash.val().gameStage;
+
+        //If the player's current stage is different than the one directed in Firebase, run stage-specific functions
+        if(stage != gameData.currentStage){
+            gameData.currentStage = stage;
+
+            //Stage 1: Host sends video. Opponent awaits video.
+            if(stage === 1){
+                if(gameData.host){
+                    //Get random video ID from video.js
+                    var newVideo = selectRandomVideo();
+                    gameData.videoId = newVideo;
+                    gameData.clickedAnswer = false;
+                    hostUpdate(1);
+                }
+
+            //Stage 2: Both players retrieve video ID pushed to Firebase in previous stage
+            } else if(stage === 2){
+                //Retrieve video ID for both players
+                gameData.videoId = splash.val().videoId;
+
+                //gameData.correctAnswer will be detailed in video.js / getVideoYear()
+                getVideoYear(gameData.videoId);
+                hostUpdate(1);
+
+            //Stage 3: Begin playing the video and register that no answers have been provided
+            } else if(stage === 3){
+                playVideoById(gameData.videoId);
+                gameData.totalAnswers = 0;
+
+            //Stage 4: One answer from either player recieved.
+            } else if(stage === 4){
+                if(gameData.clickedAnswer){
+                    $("#gameTimer").text('Waiting for other player...');
+                }
+
+            //Stage 5: Responses from both players received
+            } else if(stage === 5){
+                hostUpdate(1);
+
+            //Stage 6: Stop timer for both players and countdown to next round
+            } else if(stage === 6){
+                stop();
+                $("#gameTimer").text("Next round about to begin!");
+                setTimeout(startTrivia, 1000 * 3);
+
+            //Stage 7: Test if max videos viewed
+            } else if(stage === 7){
+                //If max answers not completed, reset to stage 1
+                if(total_answer != gameData.maxAnswers){
+                    gameData.targetStage = 0;
+                }
+                hostUpdate(1);
+
+            //Stage 8: Game is over
+            } else if(stage === 8){
+                $("#question").text("Game over!");                
+                stop();
+            }
+        }
+    }
+}); 
 
 // Action after player 2 signs in and clicks "enter" - only runs once
 function countdown() {
@@ -383,19 +381,6 @@ $(".answer").on("click", function() {
             });
         }
     }
-});
-
-// Add button styles
-$("#start-button").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
-});
-
-$("#userName").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
 });
 
 // A few divs we have to hide at the start of the game
