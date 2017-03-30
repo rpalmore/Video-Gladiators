@@ -386,10 +386,11 @@ function waitForGame(){
 
 function restartGame(){
     //The following needs to happen at some point to restart the game
+    //Maybe change text and set this on a timer?
     total_answer = 0;
     gameData.currentStage = 0;
     gameData.targetStage = 0;
-    hostUpdate(1);
+    startTrivia();
     //
 }
 
