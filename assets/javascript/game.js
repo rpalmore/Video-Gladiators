@@ -1,10 +1,10 @@
 //Configure Firebase connection
 var config = {
-    apiKey: "AIzaSyB6dvUdBGMWjFbn0V6-nd7AAq5iHwoQbJU",
-    authDomain: "megacow-1cf45.firebaseapp.com",
-    databaseURL: "https://megacow-1cf45.firebaseio.com",
-    storageBucket: "megacow-1cf45.appspot.com",
-    messagingSenderId: "182729803547"
+apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
+authDomain: "musicchallenge-86176.firebaseapp.com",
+databaseURL: "https://musicchallenge-86176.firebaseio.com",
+storageBucket: "musicchallenge-86176.appspot.com",
+messagingSenderId: "666483398318"
 };
 firebase.initializeApp(config);
 var database = firebase.database();
@@ -39,6 +39,7 @@ var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
+var img_url;
 
 //Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(){
@@ -66,7 +67,7 @@ var generate_multipleChoices = function(correct_answer){
     var index = 0;
     while (index < 3){
         var randomNumber = correct_answer + math.randomInt(-10,10);
-        if (multipleChoices.indexOf(randomNumber) === -1){
+        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber <=2017){
             multipleChoices.push(randomNumber);
             index ++;
         }
@@ -204,6 +205,26 @@ playersTree.on("value", function(snapshot) {
     }
 });
 
+// Get firebase ajax call, add the fetched imagin to DOM
+function getfirebase_info(){
+    $.ajax({
+        url : "https://musicchallenge-86176.firebaseio.com/.json",
+        method : "GET"
+    }).done(function(response){
+        if (response.players.length === 2){
+            $("#player1-image").attr("src",response.players[1].img);
+            console.log("this is 1");
+        }
+        else if (response.players.length ===3){
+            $("#player1-image").attr("src",response.players[1].img);
+            $("#player2-image").attr("src",response.players[2].img);
+            console.log("this is 2");
+        }             
+    })
+}
+
+playersTree.on('child_added',getfirebase_info);
+
 // Display player 1 username in "welcome" div
 function enterGame() {
     if (currentPlayers < 2) {
@@ -222,7 +243,8 @@ function enterGame() {
         playerTree.set({
             name: username,
             wins: 0,
-            losses: 0
+            losses: 0,
+            img : img_url
         });
 
         playerTree.onDisconnect().remove();
