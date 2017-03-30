@@ -85,6 +85,7 @@ function capitalize(name){
 
 // Display player 1 username in "welcome" div
 function enterGame() {
+    console.log('enter game');
     if (currentPlayers < 2) {
         if (playerOneOnline) {
             console.log('assign player 2');
@@ -112,6 +113,7 @@ function enterGame() {
         $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
 
     } else {
+        console.log('here');
         //Add a waiting player to database
         playerNum = currentPlayers + 1;
         playerTree = database.ref("/players/" + playerNum);
@@ -131,24 +133,21 @@ function enterGame() {
 playersTree.on("value", function(snapshot) {
     currentPlayers = snapshot.numChildren();
 
-    console.log(currentPlayers);
-    
     playerOneOnline = snapshot.child("1").exists();
     playerTwoOnline = snapshot.child("2").exists();
     playerOneData = snapshot.child("1").val();
     playerTwoData = snapshot.child("2").val();
     
     if (currentPlayers >= 2 && !gameData.playingGame) {
+        $("#login-switch").hide();
+        $("#start-button, #userName").hide();
+        $(".welcome").hide();
         //Only start the countdown if the player has been assigned a player number
         if(activePlayer()){
-            console.log('active player');
             gameData.playingGame = true;
-            $("#login-switch").hide();
-            $("#start-button, #userName").hide();
-            $(".welcome").hide();
             countdown();
         } else {
-            console.log('Not an active player');
+            startTrivia();
         }
     } else if (currentPlayers < 2){
         //Host player resets game data
@@ -192,16 +191,8 @@ function hostUpdate(stageAddition){
 
 //Runs whenever the game status is updated in Firebase
 gameStatus.on('value', function(splash){
-    //On first load (no players) reset game stage to 0
-    if(currentPlayers == null){
-        gameData.targetStage = 0;
-        gameData.currentStage = 0;
-        gameStatus.update({
-            gameStage: 0
-        });
-    }
 
-    if(gameData.playingGame && playerNum != null){
+    if(gameData.playingGame && activePlayer()){
         //Get the current stage of the game as stored in Firebase
         var stage = splash.val().gameStage;
 
@@ -260,6 +251,7 @@ gameStatus.on('value', function(splash){
             } else if(stage === 8){
                 $("#question").text("Game over!");                
                 stop();
+                restartGame();
             }
         }
     }
@@ -290,17 +282,23 @@ function decrement1() {
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
 function startTrivia() {
-    timer = 15;
-    intervalID = setInterval(decrement2, 1000);
-    $("#question").text("What year was this video released?");
-    $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
-    $("#timer").hide();
-    $(".answerPlaceholder").remove();
-    $(".answer, .score, #player").show();
+    if(activePlayer()){
+        timer = 15;
+        intervalID = setInterval(decrement2, 1000);
+        $("#question").text("What year was this video released?");
+        $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
+        $("#timer").hide();
+        $(".answerPlaceholder").remove();
+        $(".answer, .score, #player").show();
 
-    //With 2 players, trigger hostUpdate() to start game stage advancing
-    gameData.clickedAnswer = false;
-    hostUpdate(1);
+        //With 2 players, trigger hostUpdate() to start game stage advancing
+        gameData.clickedAnswer = false;
+        hostUpdate(1);
+    } else {
+        gameData.playingGame = false;
+        playerNum = 3;
+        waitForGame();
+    }
 }
 
 // This is the clock counting down and restarting
@@ -333,7 +331,6 @@ function decrement2() {
 function stop() {
     clearInterval(intervalID);
 }
-
 
 var generate_multipleChoices = function(correct_answer){
     multipleChoices = [correct_answer];
@@ -382,6 +379,19 @@ $(".answer").on("click", function() {
         }
     }
 });
+
+function waitForGame(){
+    //This is what will happen when a player joins and the game is already playing
+}
+
+function restartGame(){
+    //The following needs to happen at some point to restart the game
+    total_answer = 0;
+    gameData.currentStage = 0;
+    gameData.targetStage = 0;
+    hostUpdate(1);
+    //
+}
 
 // A few divs we have to hide at the start of the game
 $(".main, .welcome").hide();
