@@ -42,39 +42,7 @@ var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
 
-//Player 1 (host) updates the relevant data in Firebase
-function hostUpdate(stageAddition){
-    //The function is called by both players but only the host player will send game data
-    if(gameData.host){
-        //Add stages based on parameter
-        gameData.targetStage += stageAddition;
-        //Set info in Firebase
-        gameStatus.set({
-            gameStage: gameData.targetStage,
-            videoId: gameData.videoId
-        });
-    }
-}
-
-var generate_multipleChoices = function(correct_answer){
-    multipleChoices = [correct_answer];
-    var index = 0;
-    while (index < 3){
-        var randomNumber = correct_answer + math.randomInt(-5, 5);
-        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber < 2018){
-            multipleChoices.push(randomNumber);
-            index ++;
-        }
-    }
-    multipleChoices.sort();
-}
-
-var AddChoice_to_DOM =  function(){
-    for(var i = 1; i <= 4; i++){
-        $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
-    }
-}
-
+//Runs whenever the game status is updated in Firebase
 gameStatus.on('value', function(splash){
     //On first load (no players) reset game stage to 0
     if(currentPlayers == null){
@@ -110,7 +78,7 @@ gameStatus.on('value', function(splash){
 
                 //gameData.correctAnswer will be detailed in video.js / getVideoYear()
                 getVideoYear(gameData.videoId);
-                hostUpdate(1)()
+                hostUpdate(1);
 
             //Stage 3: Begin playing the video and register that no answers have been provided
             } else if(stage === 3){
@@ -150,6 +118,7 @@ gameStatus.on('value', function(splash){
     }
 }); 
 
+//Runs whenever players are modified in Firebase
 playersTree.on("value", function(snapshot) {
     currentPlayers = snapshot.numChildren();
     
@@ -158,14 +127,16 @@ playersTree.on("value", function(snapshot) {
     playerOneData = snapshot.child("1").val();
     playerTwoData = snapshot.child("2").val();
     
-    if (currentPlayers === 2 && !gameData.playingGame) {
+    if (currentPlayers >= 2 && !gameData.playingGame) {
         //Only start the countdown if the player has been assigned a player number
-        if(activePlayer){
+        if(activePlayer()){
             gameData.playingGame = true;
-            $("#login-switch").hide();
-            $("#start-button, #userName").hide();
-            $(".welcome").hide();
+            // $("#login-switch").hide();
+            // $("#start-button, #userName").hide();
+            // $(".welcome").hide();
             countdown();
+        } else {
+            console.log('Not an active player');
         }
     } else if (currentPlayers < 2){
         //Host player resets game data
@@ -193,19 +164,51 @@ playersTree.on("value", function(snapshot) {
     }
 });
 
+//Player 1 (host) updates the relevant data in Firebase
+function hostUpdate(stageAddition){
+    //The function is called by both players but only the host player will send game data
+    if(gameData.host){
+        //Add stages based on parameter
+        gameData.targetStage += stageAddition;
+        //Set info in Firebase
+        gameStatus.set({
+            gameStage: gameData.targetStage,
+            videoId: gameData.videoId
+        });
+    }
+}
+
+var generate_multipleChoices = function(correct_answer){
+    multipleChoices = [correct_answer];
+    var index = 0;
+    while (index < 3){
+        var randomNumber = correct_answer + math.randomInt(-5, 5);
+        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber < 2018){
+            multipleChoices.push(randomNumber);
+            index ++;
+        }
+    }
+    multipleChoices.sort();
+}
+
+var AddChoice_to_DOM =  function(){
+    for(var i = 1; i <= 4; i++){
+        $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
+    }
+}
+
 // Display player 1 username in "welcome" div
 function enterGame() {
     if (currentPlayers < 2) {
         if (playerOneOnline) {
             playerNum = 2;
             gameData.host = false;
-        }
-        else {
+        } else {
             playerNum = 1;
             gameData.host = true;
             gameData.targetStage = 0;
             gameData.currentStage = 0;
-            //Call hostUpdate to reset Firebase to default values
+            //Host player calls hostUpdate to reset Firebase to default values
             hostUpdate(0);
         }
         playerTree = database.ref("/players/" + playerNum);
@@ -220,7 +223,21 @@ function enterGame() {
         $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
 
     } else {
-        console.log(currentPlayers);
+        //Add a waiting player to database
+        playerNum = currentPlayers + 1;
+        playerTree = database.ref("/players/" + playerNum);
+        playerTree.set({
+            name: username,
+            status: 'waiting'
+        });
+        playerTree.onDisconnect().remove();
+
+        //If waiting player, show game platform
+        $("#login-switch").hide();
+        $("#start-button, #userName").hide();
+        $(".welcome").hide();
+        $(".score, #player").show();
+        $(".main").show();
     }
 };
 
@@ -238,7 +255,6 @@ function countdown() {
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
 function startTrivia() {
-    console.log('start trivia')
     timer = 15;
     intervalID = setInterval(decrement2, 1000);
     $("#question").text("What year was this video released?");
@@ -290,7 +306,6 @@ function decrement2() {
 }
 
 function stop() {
-    console.log('stop');
     clearInterval(intervalID);
 }
 
@@ -310,20 +325,28 @@ function capitalize(name){
 $("#start-button").click(function() {
     if ($("#username").val() !== "") {
         username = capitalize(($("#userName").val().trim()));
+        enterGame();
+
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
-        $(".welcome").show();
-        enterGame();
+
+        if(activePlayer()){ 
+            $(".welcome").show();
+        }
     }
 });
 
 $("#userName").keypress(function(e){
     if(e.keyCode === 13 && $("#username").val()!==""){
         username = capitalize($("#userName").val().trim());
+        enterGame();
+        
         $("#start-button, #userName").hide();
         $(".jumbotron, video").slideUp(1000);
-        $(".welcome").show();
-        enterGame();
+
+        if(activePlayer()){ 
+            $(".welcome").show();
+        }
     }
 });
 
