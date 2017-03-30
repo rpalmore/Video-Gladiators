@@ -22,7 +22,6 @@ var gameData = {
     correctAnswer: null,
     clickedAnswer: false,
     playingGame: false,
-    playerNum: null,
     host: null,
     maxAnswers: 5
 }
@@ -131,9 +130,9 @@ playersTree.on("value", function(snapshot) {
         //Only start the countdown if the player has been assigned a player number
         if(activePlayer()){
             gameData.playingGame = true;
-            // $("#login-switch").hide();
-            // $("#start-button, #userName").hide();
-            // $(".welcome").hide();
+            $("#login-switch").hide();
+            $("#start-button, #userName").hide();
+            $(".welcome").hide();
             countdown();
         } else {
             console.log('Not an active player');
@@ -201,10 +200,12 @@ var AddChoice_to_DOM =  function(){
 function enterGame() {
     if (currentPlayers < 2) {
         if (playerOneOnline) {
+            console.log('assign player 2');
             playerNum = 2;
             gameData.host = false;
         } else {
             playerNum = 1;
+            console.log('assign player 1');
             gameData.host = true;
             gameData.targetStage = 0;
             gameData.currentStage = 0;
@@ -232,12 +233,9 @@ function enterGame() {
         });
         playerTree.onDisconnect().remove();
 
-        //If waiting player, show game platform
-        $("#login-switch").hide();
-        $("#start-button, #userName").hide();
-        $(".welcome").hide();
-        $(".score, #player").show();
-        $(".main").show();
+        //If waiting player, show game platform but not able to modify
+        $("#login-switch #start-button, #userName .welcome").hide();
+        $(".score, #player .main").show();
     }
 };
 
