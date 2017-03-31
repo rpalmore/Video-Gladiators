@@ -85,7 +85,6 @@ function capitalize(name){
 
 // Display player 1 username in "welcome" div
 function enterGame() {
-    console.log('enter game');
     if (currentPlayers < 2) {
         if (playerOneOnline) {
             console.log('assign player 2');
@@ -113,7 +112,6 @@ function enterGame() {
         $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
 
     } else {
-        console.log('here');
         //Add a waiting player to database
         playerNum = currentPlayers + 1;
         playerTree = database.ref("/players/" + playerNum);
@@ -123,9 +121,9 @@ function enterGame() {
         });
         playerTree.onDisconnect().remove();
 
-        //If waiting player, show game platform but not able to modify
-        $("#login-switch, #start-button, #userName, .welcome").hide();
-        $(".score, #player .main").show();
+        $(".score, #player, .main").show();
+        $("#video-placeholder").hide();
+        $('.answer').css('visibility', 'hidden');
     }
 };
 
@@ -139,20 +137,25 @@ playersTree.on("value", function(snapshot) {
     playerTwoData = snapshot.child("2").val();
     
     if (currentPlayers >= 2 && !gameData.playingGame) {
-        $("#login-switch").hide();
-        $("#start-button, #userName").hide();
-        $(".welcome").hide();
-        //Only start the countdown if the player has been assigned a player number
+
         if(activePlayer()){
+            $("#login-switch").hide();
+            $("#start-button, #userName").hide();
+            $(".welcome").hide();
             gameData.playingGame = true;
             countdown();
         } else {
             startTrivia();
         }
     } else if (currentPlayers < 2){
-        //Host player resets game data
-        gameData.targetStage = 0;
-        gameData.currentStage = 0;
+        //If the current playerNum is 3 (i.e. next in line), assign to open player
+        if(playerNum === 3){
+            //console.log('take over open play');
+        } else {
+            //Host player resets game data
+            gameData.targetStage = 0;
+            gameData.currentStage = 0;
+        }
     }
 
     if (playerOneOnline) {
@@ -192,7 +195,7 @@ function hostUpdate(stageAddition){
 //Runs whenever the game status is updated in Firebase
 gameStatus.on('value', function(splash){
 
-    if(gameData.playingGame && activePlayer()){
+    if(gameData.playingGame){
         //Get the current stage of the game as stored in Firebase
         var stage = splash.val().gameStage;
 
@@ -200,7 +203,7 @@ gameStatus.on('value', function(splash){
         if(stage != gameData.currentStage){
             gameData.currentStage = stage;
             //Stage 1: Host sends video. Opponent awaits video.
-            if(stage === 1){
+            if(stage === 1  && activePlayer()){
                 if(gameData.host){
                     //Get random video ID from video.js
                     var newVideo = selectRandomVideo();
@@ -224,13 +227,13 @@ gameStatus.on('value', function(splash){
                 gameData.totalAnswers = 0;
 
             //Stage 4: One answer from either player recieved.
-            } else if(stage === 4){
+            } else if(stage === 4  && activePlayer()){
                 if(gameData.clickedAnswer){
                     $("#gameTimer").text('Waiting for other player...');
                 }
 
             //Stage 5: Responses from both players received
-            } else if(stage === 5){
+            } else if(stage === 5  && activePlayer()){
                 hostUpdate(1);
 
             //Stage 6: Stop timer for both players and countdown to next round
@@ -273,30 +276,35 @@ function countdown() {
 function decrement1() {
     timer--;
     $("#timer").text("We will begin the match in:" + (" ") + timer + (" ") + "seconds");
-        if (timer === 0) {
-            stop();
-            startTrivia();
-        }
+    if (timer === 0) {
+        stop();
+        startTrivia();
+    }
 }
 
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
 function startTrivia() {
+        $("#question").text("What year was this video released?");
+        if(activePlayer()){
+            $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
+        } else {
+            $("#gameTimer").text('Waiting until next game...');
+        }
+        $("#timer").hide();
+        $(".answerPlaceholder").remove();
+        $(".score, #player").show();
     if(activePlayer()){
         timer = 15;
         intervalID = setInterval(decrement2, 1000);
-        $("#question").text("What year was this video released?");
-        $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
-        $("#timer").hide();
-        $(".answerPlaceholder").remove();
-        $(".answer, .score, #player").show();
+        $(".answer").show();
 
         //With 2 players, trigger hostUpdate() to start game stage advancing
         gameData.clickedAnswer = false;
         hostUpdate(1);
     } else {
-        gameData.playingGame = false;
-        playerNum = 3;
+        $(".answer").show();
+        gameData.playingGame = true;
         waitForGame();
     }
 }
