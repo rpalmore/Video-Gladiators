@@ -254,7 +254,7 @@ gameStatus.on('value', function(splash){
             } else if(stage === 8){
                 $("#question").text("Game over!");                
                 stop();
-                restartGame();
+                showEndGame();
             }
         }
     }
@@ -388,8 +388,12 @@ $(".answer").on("click", function() {
     }
 });
 
-function waitForGame(){
-    //This is what will happen when a player joins and the game is already playing
+function showEndGame(){
+    if(activePlayer()){
+        //This will happen for players 1 and 2
+    } else {
+        //This will happen for waiting players
+    }
 }
 
 function restartGame(){
