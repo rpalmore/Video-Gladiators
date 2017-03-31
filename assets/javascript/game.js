@@ -23,7 +23,8 @@ var gameData = {
     clickedAnswer: false,
     playingGame: false,
     host: null,
-    maxAnswers: 5
+    maxAnswers: 5,
+    currentVideo: 0
 }
 
 var timer = 15;
@@ -205,12 +206,15 @@ gameStatus.on('value', function(splash){
             //Stage 1: Host sends video. Opponent awaits video.
             if(stage === 1  && activePlayer()){
                 if(gameData.host){
-                    //Get random video ID from video.js
-                    var newVideo = selectRandomVideo();
+                    //Get next video ID from video.js
+                    var newVideo = selectVideoByNumber(gameData.currentVideo);
                     gameData.videoId = newVideo;
-                    gameData.clickedAnswer = false;
-                    hostUpdate(1);
+                    gameData.currentVideo++;
+
+                    isPlayable(newVideo);
                 }
+
+                hostUpdate(1);
 
             //Stage 2: Both players retrieve video ID pushed to Firebase in previous stage
             } else if(stage === 2){
@@ -224,6 +228,7 @@ gameStatus.on('value', function(splash){
             //Stage 3: Begin playing the video and register that no answers have been provided
             } else if(stage === 3){
                 playVideoById(gameData.videoId);
+                gameData.clickedAnswer = false;
                 gameData.totalAnswers = 0;
 
             //Stage 4: One answer from either player recieved.
@@ -285,15 +290,16 @@ function decrement1() {
 // This is our timer countdown for the trivia questions. We will need a loop
 // around this eventually I think, to get to the final page after 15 rounds.
 function startTrivia() {
-        $("#question").text("What year was this video released?");
-        if(activePlayer()){
-            $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
-        } else {
-            $("#gameTimer").text('Waiting until next game...');
-        }
-        $("#timer").hide();
-        $(".answerPlaceholder").remove();
-        $(".score, #player").show();
+
+    $("#question").text("What year was this video released?");
+    if(activePlayer()){
+        $("#gameTimer").text("You have:" + (" ") + timer + (" ") + "seconds");
+    } else {
+        $("#gameTimer").text('Waiting until next game...');
+    }
+    $("#timer").hide();
+    $(".answerPlaceholder").remove();
+    $(".score, #player").show();
     if(activePlayer()){
         timer = 15;
         intervalID = setInterval(decrement2, 1000);
@@ -402,6 +408,7 @@ function restartGame(){
     total_answer = 0;
     gameData.currentStage = 0;
     gameData.targetStage = 0;
+    gameData.currentVideo = 0;
     startTrivia();
     //
 }
