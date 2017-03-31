@@ -17,6 +17,40 @@
 
 </head>
 <body>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1159955214127114',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });  
+  };
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+  function fblogin(){
+    FB.getLoginStatus(function(response){
+        if (response.status == "connected"){
+            getUserProfile();
+        }else{
+            FB.login();
+            fblogin();
+        }
+    });
+    function getUserProfile(){
+        FB.api('/me?fields=id,name', function(response){
+            username =response.name;
+            img_url = "http://graph.facebook.com/" + response.id + "/picture?type=large";
+            enterGame();
+        })
+    }
+    };
+</script>
 
 <div class="container-fluid">
 
@@ -36,10 +70,8 @@
 	<div class="top text-center">
 
 		<div id="login-switch">
-			<input id="userName" placeholder="User Name"/>
-		</div>
-
-		<button id="start-button">Enter the arena</button>
+			<fb:login-button data-max-rows="1" data-size="xlarge" scope="public_profile,email" onlogin="fblogin();"></fb:login-button>
+        </div>
 
 <!-- This is the page after player 1 clicks "enter the arena" -->
 
@@ -71,7 +103,7 @@
 
 			<div class="players col-xs-4">
 				<p>
-					<img id="player1-image" src="assets/images/player1.png" alt="player one">
+					<img class="img-circle" id="player1-image" src="assets/images/player1.png" alt="player one">
 				</p>
 				<p>
 					<span id="player1-name"></span>
@@ -95,7 +127,7 @@
 
 			<div class="players col-xs-4">
 				<p>
-					<img id="player2-image" src="assets/images/player2.png" alt="player two">
+					<img class="img-circle" id="player2-image" src="assets/images/player2.png" alt="player two">
 				</p>
 				<p>
 					<span id="player2-name"></span>
