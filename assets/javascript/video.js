@@ -77,13 +77,25 @@ function loadVideos(){
 				}
 				videoPlayer.videoList.push(response.items[i].contentDetails.videoId);
 			}
+			shuffleVideos();
 		});
 	});
 }
 
-//Returns video ID of video stored in videoPlayer.videoList
-function selectRandomVideo(){
-	var num = Math.floor(Math.random()*videoPlayer.videoList.length);
+function shuffleVideos(){
+	var totalVideos = videoPlayer.videoList.length;
+
+	//Randomly shuffle order of questions
+	for(var i = 0; i < totalVideos; i++){
+		var randomPlace = Math.floor(Math.random() * totalVideos);
+		var temp = videoPlayer.videoList[randomPlace];
+		videoPlayer.videoList[randomPlace] = videoPlayer.videoList[i];
+		videoPlayer.videoList[i] = temp;
+	}
+}
+
+//Returns video ID of video in list
+function selectVideoByNumber(num){
 	return videoPlayer.videoList[num];
 }
 
@@ -92,6 +104,20 @@ function playVideoById(vidId){
 	done = false;
 	player.loadVideoById(vidId);
 	player.playVideo();
+}
+
+function isPlayable(vidId){
+	var queryURL = 'https://www.googleapis.com/youtube/v3/videos';
+    queryURL += '?key=' + videoPlayer.key;
+    queryURL += '&part=contentDetails&id='+vidId;
+    queryURL += '&videoEmbeddable=true&videoSyndicated=true'
+
+    $.ajax({
+    	url: queryURL,
+    	method: 'GET'
+    }).done(function(response){
+    	var licensed = response.items[0].contentDetails.licensedContent;
+    });
 }
 
 //Stop the video playback
