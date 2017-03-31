@@ -3,6 +3,7 @@ body {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
+	font-family: 'Roboto', sans-serif;
 }
 
 .jumbotron {
@@ -10,18 +11,23 @@ body {
 	border-bottom: 1px solid #000000;
 }
 
-.youArePlayer {
-	padding-top: 10px;
-}
-
-/* This is the gif that plays in the jumbotron
-   in the very first screen */
 video {
 	width: 20%;
 	position: absolute;
 }
 
-.welcome {
+/*/////////////////////////////
+///////////// WELCOME STYLES */
+
+.youArePlayer {
+	padding-top: 10px;
+}
+
+.userOverflow {
+	padding-top: 10px;
+}
+
+.welcome, .welcome-overflow {
 	height: 150px;
 	line-height: 75px;
 	background-color: #3498db;
@@ -29,8 +35,9 @@ video {
 	border: 1px solid #000000;
 }
 
-/* Below is the "loading" CSS
-   as we wait for player 2 */
+/*/////////////////////////////
+/////////////// LOADING TEXT */
+
 h3 {
 	position: relative;
     color: rgba(0, 0, 0, .3);
@@ -41,7 +48,7 @@ h3:before {
     content: attr(data-text);
     position: absolute;
     overflow: hidden;
-    max-width: 35%;
+    max-width: 40%;
     white-space: nowrap;
     color: #ffffff;
     font-weight: bold;
@@ -54,9 +61,9 @@ h3:before {
     }
 }
 
-/* End "loading" CSS */
+/*/////////////////////////////
+/////////// HOME PAGE STYLES */
 
-/* This is the big question mark */
 #video-placeholder {
 	width: 300px;
 	height: 300px;
@@ -77,6 +84,14 @@ h3:before {
  	margin-right: 28%;
 }
 
+#start-button:hover {
+	background-color: #fdd865;
+}
+
+#userName:hover {
+	background-color: #fdd865;
+}
+
 #userName {
  	font-size: 22px;
  	text-align: center;
@@ -85,8 +100,9 @@ h3:before {
  	text-transform: capitalize;
 }
 
-/* This is the white backdrop when
-   game starts */
+/*/////////////////////////////
+/////////// MAIN DIV SECTION */
+
 .main {
 	margin-top: 10px;
 	margin-right: 100px;
@@ -112,10 +128,15 @@ h3:before {
 	margin-bottom: 20px;
 }
 
+
 .img-circle{
 	height:150px;
 	width:50px;
 }
+
+/*/////////////////////////////
+////////////// PLAYER STYLES */
+
 
 #player1-image {
 	width: 40%;
@@ -125,26 +146,15 @@ h3:before {
 	width: 40%;
 }
 
-#player1-chat {
-	transform:scale(-1,1);
-	width: 30%;
-	float: left;
-}
-
-#player2-chat {
-	width: 30%;
-	float: right;
-}
-
 #player1-name {
 	font-size: 24px;
-	border-bottom: 3px solid #000000;
+	border-bottom: 5px solid #ab241c;
 	margin-bottom: 10px;
 }
 
 #player2-name {
 	font-size: 24px;
-	border-bottom: 3px solid #000000;
+	border-bottom: 5px solid #5d9ad1;
 	margin-bottom: 10px;
 }
 
@@ -160,7 +170,9 @@ h3:before {
 	margin-top: 10px;
 }
 
-/* Answer buttons */
+/*/////////////////////////////
+////////////// BUTTON SYTLES */
+
 button {
 	display: block;
 	width: 100%;
@@ -169,3 +181,83 @@ button {
 	text-align: center;
 }
 
+/*/////////////////////////////
+//////////////// CHAT STYLES */
+
+#chat {
+  height: 150px;
+}
+
+#chat-messages {
+  margin-top: 15px;
+  height: 125px;
+  overflow: auto;
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-left: 1px solid #000000;
+}
+
+#chat-bar {
+}
+
+#chat-input {
+ 	font-size: 22px;
+ 	text-align: center;
+ 	float: left;
+ 	width: 80%;
+ 	height: 60px;
+ 	background-color: #ffffff;
+ 	border: 1px solid #000000;
+}
+
+#chat-send {
+ 	font-size: 16px;
+ 	float: right;
+ 	width: 20%;
+ 	height: 60px;
+ 	background-color: #ffffff;
+ 	border: 1px solid #000000;
+}
+
+#chat-send:hover {
+ 	background-color: #fdd865;
+}
+
+.player0 {
+  color: #000;
+  background-color: #d3d3d3;
+}
+
+/*/////////////////////////////
+/////////////// VIDEO PLAYER */
+
+.video-container {
+	position:relative;
+	padding-bottom:56.25%;
+	padding-top:15px;
+	height:0;
+	overflow:hidden;
+}
+
+.video-container iframe, .video-container object, .video-container embed {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+
+@media screen and (min-width: 992px) {
+	.video-container iframe, .video-container object, .video-container embed {
+		/*position:absolute;*/
+		top:0;
+		left:20.5%;
+		width: 60%;
+		height: 75%;
+		/*margin: auto;*/
+	}
+
+	.video-container {
+		padding-bottom:28%;
+	}
+}

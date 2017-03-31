@@ -8,7 +8,11 @@
 	
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+<<<<<<< HEAD
 
+=======
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+>>>>>>> feature/markup
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
 	<!-- <script src='https://www.youtube.com/iframe_api'></script> -->
@@ -101,7 +105,7 @@
 
 		<div class="row text-center">
 
-			<div class="players col-xs-4">
+			<div class="player1 col-xs-4">
 				<p>
 					<img class="img-circle" id="player1-image" src="assets/images/player1.png" alt="player one">
 				</p>
@@ -125,7 +129,7 @@
 				<button id="answer4" class='answer'></button>
 			</div>
 
-			<div class="players col-xs-4">
+			<div class="player2 col-xs-4">
 				<p>
 					<img class="img-circle" id="player2-image" src="assets/images/player2.png" alt="player two">
 				</p>
@@ -138,6 +142,16 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Testing chat feature -->
+		<div id="chat">
+        	<div id="chat-messages"></div>
+        		<div id="chat-bar">
+          			<input id="chat-input" placeholder="Message your opponent"/>
+          			<button id="chat-send">Send</button>
+        	</div>
+        </div>
+        <!-- End of test -->
 	</div>
 
 </div>
