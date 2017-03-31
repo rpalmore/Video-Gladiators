@@ -40,6 +40,7 @@ var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
 var img_url;
+var modal = document.getElementById('myModal');
 
 //Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(){
@@ -80,6 +81,19 @@ var AddChoice_to_DOM =  function(){
         $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
     }
 }
+
+//end modal when game hits limit
+function endScreen() {
+    if (playerOneData.wins > playerTwoData.wins) {
+        $('.endWins1').text(playerOneData.name + " WON");
+    }
+    else if (playerTwoData.wins > playerOneData.wins) {
+        $('.endWins1').text(playerTwoData.name + " WON");
+    }
+    else if (playerTwoData.wins === playerOneData.wins) {
+       $('.endWins1').text("TIE"); 
+    }
+};
 
 //Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
 // Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
@@ -158,6 +172,8 @@ gameInfo.on('value', function(splash){
                 console.log('Game over');
                 $("#question").text("Game over!");
                 stop();
+                modal.style.display = "block";
+                endScreen();
             }
         }
     }
@@ -335,6 +351,17 @@ function capitalize(name){
     return name.charAt(0).toUpperCase()+ name.slice(1);
  }
 
+ // Action when player 1 clicks "enter the arena"
+$("#start-button").click(function() {
+    if ($("#username").val() !== "") {
+         username = capitalize(($("#userName").val().trim()));
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+        $(".welcome").show();
+        enterGame();
+    }
+});
+
 $("#userName").keypress(function(e){
     if(e.keyCode === 13 && $("#username").val()!==""){
         username = capitalize($("#userName").val().trim())
@@ -373,18 +400,6 @@ $(".answer").on("click", function() {
     }
 });
 
-// Add button styles
-$("#start-button").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
-});
-
-$("#userName").hover(function(){
-    $(this).css("background-color", "#fdd865");
-    }, function(){
-        $(this).css("background-color", "white");
-});
 
 // A few divs we have to hide at the start of the game
 $(".main, .welcome").hide();
