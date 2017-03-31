@@ -152,7 +152,11 @@ playersTree.on("value", function(snapshot) {
     } else if (currentPlayers < 2){
         gameData.targetStage = 0;
         gameData.currentStage = 0;
+
+    //This part loads if a new player enters while in waiting stage
     } else if (currentPlayers === 2 && gameData.awaitingPlayer){
+        gameData.awaitingPlayer = false;
+        stop();
         gameStatus.set({
             gameStage: 9,
             videoId: gameData.videoId
