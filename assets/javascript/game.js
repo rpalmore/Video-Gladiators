@@ -235,6 +235,9 @@ function enterGame() {
         else {
             playerNum = 1;
             gameData.host = true;
+            $("#login-switch").hide();
+            $(".jumbotron, video").slideUp(1000);
+            $(".welcome").show();
             //Call hostUpdate to reset Firebase to default values
             hostUpdate();
         }
@@ -331,17 +334,6 @@ function stop() {
 function capitalize(name){
     return name.charAt(0).toUpperCase()+ name.slice(1);
  }
-
-// Action when player 1 clicks "enter the arena"
-$("#start-button").click(function() {
-    if ($("#username").val() !== "") {
-         username = capitalize(($("#userName").val().trim()));
-        $("#start-button, #userName").hide();
-        $(".jumbotron, video").slideUp(1000);
-        $(".welcome").show();
-        enterGame();
-    }
-});
 
 $("#userName").keypress(function(e){
     if(e.keyCode === 13 && $("#username").val()!==""){
