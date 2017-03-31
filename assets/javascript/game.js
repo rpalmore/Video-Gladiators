@@ -24,7 +24,8 @@ var gameData = {
     playingGame: false,
     host: null,
     maxAnswers: 5,
-    currentVideo: 0
+    currentVideo: 0,
+    awaitingPlayer: false
 }
 
 var timer = 15;
@@ -149,14 +150,13 @@ playersTree.on("value", function(snapshot) {
             startTrivia();
         }
     } else if (currentPlayers < 2){
-        //If the current playerNum is 3 (i.e. next in line), assign to open player
-        if(playerNum === 3){
-            //console.log('take over open play');
-        } else {
-            //Host player resets game data
-            gameData.targetStage = 0;
-            gameData.currentStage = 0;
-        }
+        gameData.targetStage = 0;
+        gameData.currentStage = 0;
+    } else if (currentPlayers === 2 && gameData.awaitingPlayer){
+        gameStatus.set({
+            gameStage: 9,
+            videoId: gameData.videoId
+        });
     }
 
     if (playerOneOnline) {
@@ -167,6 +167,14 @@ playersTree.on("value", function(snapshot) {
         $("#player1-name").text("DISCONNECTED");
         $("#player1-wins").text("x");
         $("#player1-losses").text("x");
+        searchForPlayer(1);
+
+        if(currentPlayers === 1){
+            gameStatus.set({
+                gameStage: 10,
+                videoId: gameData.videoId
+            });
+        }
     }
     if (playerTwoOnline) {
         $("#player2-name").text(playerTwoData.name);
@@ -176,8 +184,53 @@ playersTree.on("value", function(snapshot) {
         $("#player2-name").text("DISCONNECTED");
         $("#player2-wins").text("x");
         $("#player2-losses").text("x");
+        searchForPlayer(2);
+
+        if(currentPlayers === 1){
+            gameStatus.set({
+                gameStage: 10,
+                videoId: gameData.videoId
+            });
+        }
     }
 });
+
+function searchForPlayer(slotNum){
+    if(playerNum >= 3){
+
+        if(playerNum === 3){
+            console.log(currentPlayers);
+            playerTree.remove();
+
+            playerNum = slotNum;
+            playerTree = database.ref("/players/" + playerNum);
+
+             $('.answer').css('visibility', 'visible');
+
+            playerTree.set({
+                name: username,
+                wins: 0,
+                losses: 0
+            });
+
+            playerTree.onDisconnect().remove();
+
+            if(playerNum === 1){
+                gameData.host = true;
+            }
+            gameData.playingGame = true;
+
+            gameStatus.set({
+                gameStage: 9,
+                videoId: gameData.videoId
+            });
+
+        //If there were more than 1 player waiting, they decrease in slot line
+        } else if(playerNum > 3){
+            playerNum--;
+        }
+    }
+}
 
 //Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(stageAddition){
@@ -260,6 +313,21 @@ gameStatus.on('value', function(splash){
                 $("#question").text("Game over!");                
                 stop();
                 showEndGame();
+
+            //Stage 9: Player disconnected and a new one was found
+            } else if(stage === 9){
+                $("#question").text("Found a new player!");
+                stop();
+                gameData.clickedAnswer = true;
+                setTimeout(startTrivia, 1000 * 3);
+
+            //Stae 10: No players to battle. Wait for one.
+            } else if(stage === 10){
+                $("#question").text("Opponent has left :(");
+                 $("#gameTimer").text("Waiting for an opponent...");
+                stop();
+                gameData.clickedAnswer = true;
+                gameData.awaitingPlayer = true;
             }
         }
     }
@@ -300,6 +368,7 @@ function startTrivia() {
     $("#timer").hide();
     $(".answerPlaceholder").remove();
     $(".score, #player").show();
+
     if(activePlayer()){
         timer = 15;
         intervalID = setInterval(decrement2, 1000);
@@ -311,7 +380,6 @@ function startTrivia() {
     } else {
         $(".answer").show();
         gameData.playingGame = true;
-        waitForGame();
     }
 }
 
@@ -343,6 +411,7 @@ function decrement2() {
 }
 
 function stop() {
+    console.log('stopped timer');
     clearInterval(intervalID);
 }
 
