@@ -11,8 +11,7 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
-	<!-- <script src='https://www.youtube.com/iframe_api'></script> -->
-	<script src='assets/javascript/iframe_api.js'></script>
+	<script src='https://www.youtube.com/iframe_api'></script>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/mathjs/3.10.1/math.min.js'></script>
 
 </head>
@@ -53,6 +52,19 @@
 </script>
 
 <div class="container-fluid">
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class='modal-header'>
+				<p class="text-center">END GAME</p>
+			</div>
+			
+			<div class="modal-body">	
+				<div class="text-center"><span class="endWins1"></span></div>
+			</div>
+
+			<div class='modal-footer'><div class="text-center"><div class="btn btn-primary" id="restartRefresh" onClick="window.location.reload()">RESTART</div></div></div>
+			</div>
+		</div>
 
 <!-- This is the page before any user action -->
 
@@ -91,10 +103,12 @@
 		<div id="question">
 		</div>
 
-		<img id="video-placeholder" src="assets/images/question-mark.png" alt="question mark">
+		<img id="video-placeholder" src="assets/images/question-mark.png">
 
 		<!-- <div id="player text-center"><img id="video-player" src="http://placehold.it/560x315"></div> -->
-		<div id="player"></div>
+		<div class="video-container">
+			<div id="player"></div>
+		</div>
 
 		<div id="gameTimer">
 		</div>
@@ -109,8 +123,10 @@
 					<span id="player1-name"></span>
 				</p>
 				<div class="score">
-					<span id="player1-wins">Wins: </span>
-					<span id="player1-losses">Losses: </span>
+					<div class="col-md-10"> 
+						<span id="player1-wins">Wins: </span>
+						<span id="player1-losses">Losses: </span>
+					</div>
 				</div>
 			</div>
 
@@ -133,8 +149,10 @@
 					<span id="player2-name"></span>
 				</p>
 				<div class="score">
-					<span id="player2-wins">Wins: </span>
-					<span id="player2-losses">Losses: </span>
+					<div class="col-md-10">
+						<span id="player2-wins">Wins: </span>
+						<span id="player2-losses">Losses: </span>
+					</div>
 				</div>
 			</div>
 		</div>

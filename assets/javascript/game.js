@@ -1,10 +1,24 @@
 //Configure Firebase connection
 var config = {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
+authDomain: "musicchallenge-86176.firebaseapp.com",
+databaseURL: "https://musicchallenge-86176.firebaseio.com",
+storageBucket: "musicchallenge-86176.appspot.com",
+messagingSenderId: "666483398318"
+=======
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
     apiKey: "AIzaSyA7NU6DtU28B200f7z6zBbiZFMUFlPj1lw",
     authDomain: "videogladiators-81826.firebaseapp.com",
     databaseURL: "https://videogladiators-81826.firebaseio.com",
     storageBucket: "videogladiators-81826.appspot.com",
     messagingSenderId: "1028142233498"
+<<<<<<< HEAD
+=======
+>>>>>>> feature/waitlobby
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 };
 
 firebase.initializeApp(config);
@@ -43,8 +57,10 @@ var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
 var img_url;
+var modal = document.getElementById('myModal');
 
 // Action when player 1 clicks "enter the arena"
+<<<<<<< HEAD
 // $("#start-button").click(function() {
 //     if ($("#username").val() !== "") {
 //         username = capitalize(($("#userName").val().trim()));
@@ -154,6 +170,159 @@ function getfirebase_info(){
 
 playersTree.on('child_added',getfirebase_info);
 
+=======
+$("#start-button").click(function() {
+    if ($("#username").val() !== "") {
+        username = capitalize(($("#userName").val().trim()));
+        enterGame();
+
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+
+<<<<<<< HEAD
+var generate_multipleChoices = function(correct_answer){
+    multipleChoices = [correct_answer];
+    var index = 0;
+    while (index < 3){
+        var randomNumber = correct_answer + math.randomInt(-10,10);
+        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber <=2017){
+            multipleChoices.push(randomNumber);
+            index ++;
+=======
+        if(playerNum == 1){ 
+            $(".welcome").show();
+>>>>>>> feature/waitlobby
+        }
+    }
+});
+
+$("#userName").keypress(function(e){
+    if(e.keyCode === 13 && $("#username").val()!==""){
+        username = capitalize($("#userName").val().trim());
+        enterGame();
+        
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+
+        if(playerNum == 1){ 
+            $(".welcome").show();
+        }
+    }
+});
+
+<<<<<<< HEAD
+//end modal when game hits limit
+function endScreen() {
+    if (playerOneData.wins > playerTwoData.wins) {
+        $('.endWins1').text(playerOneData.name + " WON");
+    }
+    else if (playerTwoData.wins > playerOneData.wins) {
+        $('.endWins1').text(playerTwoData.name + " WON");
+    }
+    else if (playerTwoData.wins === playerOneData.wins) {
+       $('.endWins1').text("TIE"); 
+    }
+};
+
+//Whenever gameInfo is modified on Firebase (i.e. the game stage is updated) search for current stage and take appropriate actions
+// Game stages prototype: 0 = awaiting players, 1 = send new video, 2 = await answers, 3 = play video, 4 = await answers
+// 5 = 1 answer, 6 = both answers, 7 = show answers, 8 = reset to 1
+=======
+function capitalize(name){
+    return name.charAt(0).toUpperCase()+ name.slice(1);
+ }
+>>>>>>> feature/waitlobby
+
+ function activePlayer(){
+    //If player has been assigned number and it is 1 or 2
+    if(playerNum != null && playerNum <= 2){
+        return true;
+    } else {
+        return false;
+    }
+ }
+
+// Display player 1 username in "welcome" div
+function enterGame() {
+    if (currentPlayers < 2) {
+        if (playerOneOnline) {
+            console.log('assign player 2');
+            playerNum = 2;
+            gameData.host = false;
+        } else {
+            playerNum = 1;
+            console.log('assign player 1');
+            gameData.host = true;
+            gameData.targetStage = 0;
+            gameData.currentStage = 0;
+
+            //Host player calls hostUpdate to reset Firebase to default values
+            hostUpdate(0);
+        }
+        playerTree = database.ref("/players/" + playerNum);
+
+        playerTree.set({
+            name: username,
+            wins: 0,
+            losses: 0
+        });
+        playerTree.onDisconnect().remove();
+
+        $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
+
+    } else {
+        //Add a waiting player to database
+        playerNum = currentPlayers + 1;
+        playerTree = database.ref("/players/" + playerNum);
+        playerTree.set({
+            name: username,
+            status: 'waiting'
+        });
+        playerTree.onDisconnect().remove();
+
+<<<<<<< HEAD
+                //Host advances stage
+                triggerHost()
+            } else if(stage === 3){
+                playVideoById(gameData.videoId);
+                gameData.totalAnswers = 0;
+            } else if(stage === 4){
+                console.log('receive first answer');
+                if(gameData.clickedAnswer){
+                    $("#gameTimer").text('Waiting for other player...');
+                }
+            } else if(stage === 5){
+                console.log('receive second answer');
+                triggerHost();
+            } else if(stage === 6){
+                console.log('check answers');
+                //Stop timer
+                stop();
+                $("#gameTimer").text("Next round about to begin!");
+                setTimeout(startTrivia, 1000 * 3);
+            } else if(stage === 7){
+                //If 15 answers not completed, reset to stage 1
+                if(total_answer != 15){
+                    gameData.targetStage = 0;
+                }
+                triggerHost();
+            } else if(stage === 8){
+                console.log('Game over');
+                $("#question").text("Game over!");
+                stop();
+                modal.style.display = "block";
+                endScreen();
+            }
+        }
+=======
+        $(".score, #player, .main").show();
+        $("#video-placeholder").hide();
+        $('.answer').css('visibility', 'hidden');
+>>>>>>> feature/waitlobby
+    }
+};
+
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 //Runs whenever players are modified in Firebase
 playersTree.on("value", function(snapshot) {
     currentPlayers = snapshot.numChildren();
@@ -167,7 +336,11 @@ playersTree.on("value", function(snapshot) {
 
         if(activePlayer()){
             $("#login-switch").hide();
+<<<<<<< HEAD
             // $("#start-button, #userName").hide();
+=======
+            $("#start-button, #userName").hide();
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
             $(".welcome").hide();
             gameData.playingGame = true;
             countdown();
@@ -224,6 +397,52 @@ playersTree.on("value", function(snapshot) {
     }
 });
 
+<<<<<<< HEAD
+function searchForPlayer(slotNum){
+    if(playerNum >= 3){
+=======
+<<<<<<< HEAD
+// Get firebase ajax call, add the fetched imagin to DOM
+function getfirebase_info(){
+    $.ajax({
+        url : "https://musicchallenge-86176.firebaseio.com/.json",
+        method : "GET"
+    }).done(function(response){
+        if (response.players.length === 2){
+            $("#player1-image").attr("src",response.players[1].img);
+            console.log("this is 1");
+        }
+        else if (response.players.length ===3){
+            $("#player1-image").attr("src",response.players[1].img);
+            $("#player2-image").attr("src",response.players[2].img);
+            console.log("this is 2");
+        }             
+    })
+}
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
+
+        if(playerNum === 3){
+            console.log(currentPlayers);
+            playerTree.remove();
+
+<<<<<<< HEAD
+=======
+// Display player 1 username in "welcome" div
+function enterGame() {
+    if (currentPlayers < 2) {
+        if (playerOneOnline) {
+            playerNum = 2;
+            gameData.host = false;
+        }
+        else {
+            playerNum = 1;
+            gameData.host = true;
+            $("#login-switch").hide();
+            $(".jumbotron, video").slideUp(1000);
+            $(".welcome").show();
+            //Call hostUpdate to reset Firebase to default values
+            hostUpdate();
+=======
 function searchForPlayer(slotNum){
     if(playerNum >= 3){
 
@@ -231,6 +450,7 @@ function searchForPlayer(slotNum){
             console.log(currentPlayers);
             playerTree.remove();
 
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
             playerNum = slotNum;
             playerTree = database.ref("/players/" + playerNum);
 
@@ -257,10 +477,24 @@ function searchForPlayer(slotNum){
         //If there were more than 1 player waiting, they decrease in slot line
         } else if(playerNum > 3){
             playerNum--;
+<<<<<<< HEAD
+=======
+>>>>>>> feature/waitlobby
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
         }
     }
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        playerTree.set({
+            name: username,
+            wins: 0,
+            losses: 0,
+            img : img_url
+=======
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 //Player 1 (host) updates the relevant data in Firebase
 function hostUpdate(stageAddition){
     //The function is called by both players but only the host player will send game data
@@ -271,6 +505,10 @@ function hostUpdate(stageAddition){
         gameStatus.set({
             gameStage: gameData.targetStage,
             videoId: gameData.videoId
+<<<<<<< HEAD
+=======
+>>>>>>> feature/waitlobby
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
         });
     }
 }
@@ -348,7 +586,11 @@ gameStatus.on('value', function(splash){
                 $("#question").text("Found a new player!");
                 stop();
                 gameData.clickedAnswer = true;
+<<<<<<< HEAD
                 setTimeout(startTrivia, 5200);
+=======
+                setTimeout(startTrivia, 1000 * 3);
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 
             //Stae 10: No players to battle. Wait for one.
             } else if(stage === 10){
@@ -360,7 +602,11 @@ gameStatus.on('value', function(splash){
             }
         }
     }
+<<<<<<< HEAD
 });
+=======
+}); 
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 
 // Action after player 2 signs in and clicks "enter" - only runs once
 function countdown() {
@@ -444,6 +690,7 @@ function stop() {
     clearInterval(intervalID);
 }
 
+<<<<<<< HEAD
 var generate_multipleChoices = function(correct_answer){
     multipleChoices = [correct_answer];
     var index = 0;
@@ -461,6 +708,40 @@ var AddChoice_to_DOM =  function(){
     for(var i = 1; i <= 4; i++){
         $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
     }
+=======
+<<<<<<< HEAD
+function capitalize(name){
+    return name.charAt(0).toUpperCase()+ name.slice(1);
+ }
+
+ // Action when player 1 clicks "enter the arena"
+$("#start-button").click(function() {
+    if ($("#username").val() !== "") {
+         username = capitalize(($("#userName").val().trim()));
+        $("#start-button, #userName").hide();
+        $(".jumbotron, video").slideUp(1000);
+        $(".welcome").show();
+        enterGame();
+=======
+var generate_multipleChoices = function(correct_answer){
+    multipleChoices = [correct_answer];
+    var index = 0;
+    while (index < 3){
+        var randomNumber = correct_answer + math.randomInt(-5, 5);
+        if (multipleChoices.indexOf(randomNumber) === -1 && randomNumber < 2018){
+            multipleChoices.push(randomNumber);
+            index ++;
+        }
+>>>>>>> feature/waitlobby
+    }
+    multipleChoices.sort();
+}
+
+var AddChoice_to_DOM =  function(){
+    for(var i = 1; i <= 4; i++){
+        $("#answer" + i).html("<i class='fa fa-circle-o fa-1.5x' aria-hidden='true'></i>" + multipleChoices[i-1]);
+    }
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 }
 
 $(".answer").on("click", function() {
@@ -492,6 +773,11 @@ $(".answer").on("click", function() {
     }
 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 function showEndGame(){
     if(activePlayer()){
         //This will happen for players 1 and 2
@@ -510,6 +796,10 @@ function restartGame(){
     startTrivia();
     //
 }
+<<<<<<< HEAD
+=======
+>>>>>>> feature/waitlobby
+>>>>>>> 05a3b659dce32c8c21b9b3af5694cec1bb6e69a2
 
 // A few divs we have to hide at the start of the game
 $(".main, .welcome").hide();
