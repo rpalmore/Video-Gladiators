@@ -130,10 +130,11 @@ h3:before {
 }
 
 
-.img-circle{
-	height:150px;
-	width:50px;
-}
+/*.img-circle{
+	display: inline-block;
+	height:100px;
+	width:70px;
+}*/
 
 .correctSelect {
 	color: #32a320;
@@ -198,7 +199,7 @@ button {
 }
 
 #chat-messages {
-  margin-top: 15px;
+  margin-top: 5px;
   height: 125px;
   overflow: auto;
   border-top: 1px solid #000000;
@@ -341,6 +342,17 @@ button {
 	
 	}
 
+	.video-container {
+		margin-top: 2%;
+	}
+
+	#video-placeholder {
+	width: 150px;
+	height: 150px;
+	margin-top: 10px;
+	margin-bottom: 1px;
+	}
+
 	#start-button, #userName {
  	width: 44%;
  	height: 60px;
@@ -375,19 +387,19 @@ button {
 	#question {
 		font-size: 12px;
 		margin-top: 8px;
-		margin-bottom: 100px;
+		margin-bottom: 25px;
 	}
 
 	/*/////////////////////////////
 	////////////// PLAYER STYLES */
 
-	#player1-image {
+/*	#player1-image {
 		width: 20%;
 	}
 
 	#player2-image {
 		width: 15%;
-	}
+	}*/
 
 	#player1-name {
 		font-size: 18px;
@@ -412,5 +424,16 @@ button {
 	#answer1, #answer2, #answer3, #answer4 {
 		margin-top: 5px;
 	}
+
+	#chat {
+  		height: 100px;
+	}
+
+	#chat-messages {
+	  margin-top: 2px;
+	  height: px;
+	}
+
+	
 
 }

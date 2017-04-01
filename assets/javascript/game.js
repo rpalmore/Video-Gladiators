@@ -1,13 +1,14 @@
 //Configure Firebase connection
 var config = {
-    apiKey: "AIzaSyA7NU6DtU28B200f7z6zBbiZFMUFlPj1lw",
-    authDomain: "videogladiators-81826.firebaseapp.com",
-    databaseURL: "https://videogladiators-81826.firebaseio.com",
-    storageBucket: "videogladiators-81826.appspot.com",
-    messagingSenderId: "1028142233498"
+apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
+authDomain: "musicchallenge-86176.firebaseapp.com",
+databaseURL: "https://musicchallenge-86176.firebaseio.com",
+projectId: "musicchallenge-86176",
+storageBucket: "musicchallenge-86176.appspot.com",
+messagingSenderId: "666483398318"
 };
-
 firebase.initializeApp(config);
+
 var database = firebase.database();
 
 //Game status database references
