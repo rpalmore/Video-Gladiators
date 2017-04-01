@@ -1,14 +1,13 @@
 //Configure Firebase connection
 var config = {
-apiKey: "AIzaSyDyjAZ5RiWX0Pt5dkiMEJ_tXbY1Z7M63Uc",
-authDomain: "musicchallenge-86176.firebaseapp.com",
-databaseURL: "https://musicchallenge-86176.firebaseio.com",
-projectId: "musicchallenge-86176",
-storageBucket: "musicchallenge-86176.appspot.com",
-messagingSenderId: "666483398318"
+    apiKey: "AIzaSyA7NU6DtU28B200f7z6zBbiZFMUFlPj1lw",
+    authDomain: "videogladiators-81826.firebaseapp.com",
+    databaseURL: "https://videogladiators-81826.firebaseio.com",
+    storageBucket: "videogladiators-81826.appspot.com",
+    messagingSenderId: "1028142233498"
 };
-firebase.initializeApp(config);
 
+firebase.initializeApp(config);
 var database = firebase.database();
 
 //Game status database references
@@ -33,6 +32,7 @@ var timer = 15;
 var intervalID;
 var playersTree = database.ref("players");
 var answersTree =  database.ref("answers");
+var chatData = database.ref("/chat");
 var currentPlayers = null;
 var username = "User";
 var playerOneOnline = false;
@@ -43,9 +43,11 @@ var playerNum = null;
 var total_answer = 0;
 var correct_answer = 0;
 var multipleChoices = [];
+var multipleChoices = [];
 var img_url;
+var modal = document.getElementById('myModal');
 
-// Action when player 1 clicks "enter the arena"
+// Action when player 1 clicks "enter the arena" OLD
 // $("#start-button").click(function() {
 //     if ($("#username").val() !== "") {
 //         username = capitalize(($("#userName").val().trim()));
@@ -60,6 +62,7 @@ var img_url;
 //     }
 // });
 
+// OLD
 // $("#userName").keypress(function(e){
 //     if(e.keyCode === 13 && $("#username").val()!==""){
 //         username = capitalize($("#userName").val().trim());
@@ -74,9 +77,9 @@ var img_url;
 //     }
 // });
 
-// function capitalize(name){
-//     return name.charAt(0).toUpperCase()+ name.slice(1);
-//  }
+function capitalize(name){
+    return name.charAt(0).toUpperCase()+ name.slice(1);
+ }
 
  function activePlayer(){
     //If player has been assigned number and it is 1 or 2
@@ -94,6 +97,9 @@ function enterGame() {
             console.log('assign player 2');
             playerNum = 2;
             gameData.host = false;
+            $("#login-switch").hide();
+            $(".jumbotron, video").slideUp(1000);
+            $(".welcome").show();
         } else {
             playerNum = 1;
             console.log('assign player 1');
@@ -113,47 +119,55 @@ function enterGame() {
             name: username,
             wins: 0,
             losses: 0,
-            img : img_url
+            img: img_url
         });
-        playerTree.onDisconnect().remove();
+
+        // Update chat on screen when new message detected - ordered by 'time' value
+        chatData.orderByChild("time").on("child_added", function(snapshot) {
+
+        // If idNum is 0, then its a disconnect message and displays accordingly
+        // If not - its a user chat message
+        if (snapshot.val().idNum === 0) {
+        $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+        + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+        } else {
+        $("#chat-messages").append("<p class=player" + snapshot.val().idNum + "><span>"
+        + snapshot.val().name + "</span>: " + snapshot.val().message + "</p>");
+        }
+
+        // Keeps div scrolled to bottom on each update.
+        $("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
+        });
 
         $(".youArePlayer").html("<h2> Hello " + username + " you are player " + playerNum + "</h2>");
-
-    } else {
-        //Add a waiting player to database
-        playerNum = currentPlayers + 1;
-        playerTree = database.ref("/players/" + playerNum);
-        playerTree.set({
-            name: username,
-            status: 'waiting',
-            img : img_url
-        });
+        // Send disconnect message to chat with Firebase server generated timestamp 
+        // and id of '0' to denote system message
         playerTree.onDisconnect().remove();
 
-        $(".score, #player, .main").show();
-        $("#video-placeholder").hide();
-        $('.answer').css('visibility', 'hidden');
-    }
-};
+        chatDataDisc.onDisconnect().set({
+            name: username,
+            time: firebase.database.ServerValue.TIMESTAMP,
+            message: "has disconnected.",
+            idNum: 0
+        });
 
-function getfirebase_info(){
-    $.ajax({
-        url : "https://musicchallenge-86176.firebaseio.com/.json",
-        method : "GET"
-    }).done(function(response){
-        if (response.players.length === 2){
-            $("#player1-image").attr("src",response.players[1].img);
-            console.log("this is 1");
+        
+
+        } else {
+            //Add a waiting player to database
+            playerNum = currentPlayers + 1;
+            playerTree = database.ref("/players/" + playerNum);
+            playerTree.set({
+                name: username,
+                status: 'waiting'
+            });
+            playerTree.onDisconnect().remove();
+
+            $(".score, #player, .main").show();
+            $("#video-placeholder").hide();
+            $('.answer').css('visibility', 'hidden');
         }
-        else if (response.players.length ===3){
-            $("#player1-image").attr("src",response.players[1].img);
-            $("#player2-image").attr("src",response.players[2].img);
-            console.log("this is 2");
-        }             
-    })
 };
-
-playersTree.on('child_added',getfirebase_info);
 
 //Runs whenever players are modified in Firebase
 playersTree.on("value", function(snapshot) {
@@ -168,7 +182,7 @@ playersTree.on("value", function(snapshot) {
 
         if(activePlayer()){
             $("#login-switch").hide();
-            // $("#start-button, #userName").hide();
+            $("#start-button, #userName").hide();
             $(".welcome").hide();
             gameData.playingGame = true;
             countdown();
@@ -194,7 +208,7 @@ playersTree.on("value", function(snapshot) {
         $("#player1-wins").text("WINS : " + playerOneData.wins);
         $("#player1-losses").text("LOSSES : " + playerOneData.losses);
     } else {
-        $("#player1-name").text("DISCONNECTED");
+        $("#player1-name").text("Offline");
         $("#player1-wins").text("x");
         $("#player1-losses").text("x");
         searchForPlayer(1);
@@ -211,7 +225,7 @@ playersTree.on("value", function(snapshot) {
         $("#player2-wins").text("WINS : " + playerTwoData.wins);
         $("#player2-losses").text("LOSSES : " + playerTwoData.losses);
     } else {
-        $("#player2-name").text("DISCONNECTED");
+        $("#player2-name").text("Offline");
         $("#player2-wins").text("x");
         $("#player2-losses").text("x");
         searchForPlayer(2);
@@ -224,6 +238,26 @@ playersTree.on("value", function(snapshot) {
         }
     }
 });
+
+// Get firebase ajax call, add the fetched imagin to DOM
+function getfirebase_info(){
+    $.ajax({
+        url : "https://test-1-df1ad.firebaseio.com/.json",
+        method : "GET"
+    }).done(function(response){
+        if (response.players.length === 2){
+            $("#player1-image").attr("src",response.players[1].img);
+            console.log("this is 1");
+        }
+        else if (response.players.length === 3){
+            $("#player1-image").attr("src",response.players[1].img);
+            $("#player2-image").attr("src",response.players[2].img);
+            console.log("this is 2");
+        }             
+    })
+}
+
+playersTree.on('child_added',getfirebase_info);
 
 function searchForPlayer(slotNum){
     if(playerNum >= 3){
@@ -240,7 +274,8 @@ function searchForPlayer(slotNum){
             playerTree.set({
                 name: username,
                 wins: 0,
-                losses: 0
+                losses: 0,
+                img: img_url
             });
 
             playerTree.onDisconnect().remove();
@@ -275,6 +310,18 @@ function hostUpdate(stageAddition){
         });
     }
 }
+
+function endScreen() {
+    if (playerOneData.wins > playerTwoData.wins) {
+        $('.endWins1').text(playerOneData.name + " WON");
+    }
+    else if (playerTwoData.wins > playerOneData.wins) {
+        $('.endWins1').text(playerTwoData.name + " WON");
+    }
+    else if (playerTwoData.wins === playerOneData.wins) {
+       $('.endWins1').text("TIE"); 
+    }
+};
 
 //Runs whenever the game status is updated in Firebase
 gameStatus.on('value', function(splash){
@@ -342,7 +389,9 @@ gameStatus.on('value', function(splash){
             } else if(stage === 8){
                 $("#question").text("Game over!");                
                 stop();
-                showEndGame();
+                // showEndGame();
+                modal.style.display = "block";
+                endScreen();
 
             //Stage 9: Player disconnected and a new one was found
             } else if(stage === 9){
@@ -477,14 +526,14 @@ $(".answer").on("click", function() {
 
         total_answer ++;
         if ($(this).text().trim()==gameData.correctAnswer){
-            $("#question").text("You're correct!");
+            $("#question").html("<div class='correctSelect'>" + "You're correct!" + "</div>");
             correct_answer ++;
             playerTree.update({
                 wins: correct_answer,
                 losses: total_answer - correct_answer
             });
         } else {
-            $("#question").text("Wrong! The correct answer is " + gameData.correctAnswer);
+            $("#question").html("<div class='incorrectSelect'>" + "Wrong! The correct answer is " + gameData.correctAnswer + "</div>");
             playerTree.update({
                 wins:correct_answer,
                 losses:total_answer - correct_answer
@@ -514,3 +563,37 @@ function restartGame(){
 
 // A few divs we have to hide at the start of the game
 $(".main, .welcome").hide();
+
+
+// User clicks "send" button to push input to Firebase
+// chat feats...
+$("#chat-send").click(function() {
+
+  if ($("#chat-input").val() !== "") {
+
+    var message = $("#chat-input").val();
+
+    chatData.push({
+        name: username,
+        message: message,
+        time: firebase.database.ServerValue.TIMESTAMP,
+        idNum: playerNum
+    });
+
+    $("#chat-input").val("");
+  }
+});
+
+// Chatbox input listener
+$("#chat-input").keypress(function(e) {
+  if (e.keyCode === 13 && $("#chat-input").val() !== "") {
+    var message = $("#chat-input").val();
+    chatData.push({
+        name: username,
+        message: message,
+        time: firebase.database.ServerValue.TIMESTAMP,
+        idNum: playerNum
+    });
+    $("#chat-input").val("");
+  }
+});
