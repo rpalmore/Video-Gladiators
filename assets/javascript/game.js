@@ -163,7 +163,7 @@ function enterGame() {
                 status: 'waiting'
             });
             playerTree.onDisconnect().remove();
-
+            $("#login-switch").hide();
             $(".score, #player, .main").show();
             $("#video-placeholder").hide();
             $('.answer').css('visibility', 'hidden');
@@ -243,7 +243,7 @@ playersTree.on("value", function(snapshot) {
 // Get firebase ajax call, add the fetched imagin to DOM
 function getfirebase_info(){
     $.ajax({
-        url : "https://test-1-df1ad.firebaseio.com/.json",
+        url : "https://musicchallenge-86176.firebaseio.com/.json",
         method : "GET"
     }).done(function(response){
         if (response.players.length === 2){
